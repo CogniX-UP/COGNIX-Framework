@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Tuning the RingBuffer Library</title>
+<style>
+	h3 {color:green;}
+	pre {
+		background-color:lightgrey;
+		border:1px solid grey;
+		padding:10px;
+		margin:30px;
+	}	
+</style>
+</head>
+<body lang="EN-US">
+
+<p>June 15, 2015</p>
+
+<h1>Tuning the RingBuffer Library</h1>
+
+<h2>Contents</h2>
+<ul>
+	<li><a href="#stride">Stride</a></li>
+	<li><a href="#sync">Sync</a></li>
+</ul>
+
+<p>The acquisition library may be tuned for better performance
+on particular machines by using the parameters STRIDE and
+SYNC, which are explained below.</p>
+
+<h3>Stride</h3>
+
+<p>During acquisition, multiple read requests are
+used to keep the data stream flowing into the ring buffer.
+By default, the read request asks for 128KB of data (131072 bytes).
+The buffer pointer returned by "READ_POINTER" is updated at the
+end of each read request.</p>
+
+<p>The msec equivalent of this update depends on the data throughput
+from the acquisition box which is controlled by the mode switch
+setting on the box itself.</p>
+
+<p>This ring buffer stride value can be shortened or lengthened.</p>
+
+<p>The shorter the stride, the higher the load placed on the computer -
+there will be more user/system/user read requests per unit of time.
+The practical limit depends on the speed of the computer being used
+and what else the computer is doing.</p>
+
+<p>The stride can set in either kbytes or msec; using msec keeps the
+stride independent of the mode switch setting.</p>
+
+<p>If you want to lengthen the stride, consider that the stride determines
+the actual number of bytes per system read call.  Somewhere in the
+system or hardware there seems to be an upper limit on the size of a
+USB read; for instance, on Vista strides above 512 msec don't work.
+You may have to try several values to find what works.</p>
+
+<p>This stride can be changed by creating a file called <em>ringbuffer.ini</em>
+that contains, for example, this line:
+<pre>
+stride_ms 32
+</pre>
+This requests reads and pointer updates approximately every
+32 msec.  The line:
+<pre>
+stride_kb 256
+</pre>
+requests a stride of 256*1024 bytes.</p>
+
+<p>Generally this file should be in the same directory as the
+acquisition program being run.  The file can, instead, be in the user's
+home directory - the library will look there if an .ini file is not
+found in the program directory.
+When running under the
+control of the National Instruments LabVIEW Workbench, the
+.ini file should be in the user's home directory because the
+NI Workbench doesn't report the location of the VI's being run.  
+On Windows, the home directory is the concatination of the
+environment variables HOMEDRIVE and HOMEPATH; on Linux and
+OSX it is the environment variable HOME.</p>
+
+<p>The stride can also be changed by using one of these subroutine
+calls:
+<pre>
+SET_STRIDE_MS(int msecs)
+</pre>
+<pre>
+SET_STRIDE_KB(int kb)
+</pre>
+
+The stride setting actually used is displayed when running
+the test program <em>RingBuffer_SyncTest</em>.</p>
+
+<h3>Sync</h3>
+
+<p>The acquisition library has an option to have "READ_POINTER"
+returns sync'ed to stride steps.  The purpose of this option is
+to avoid burning up computer time looping on READ_POINTER calls,
+waiting for the pointer to change.</p>
+
+<p>This setting is more important with regular Linux and Mac OSX
+because on these systems all threads in a program run at the same
+priority.  Windows, on the other hand, allows the acquisition thread
+to run at a higher priority than the user's calling thread.</p>
+
+<p>By default this option is turned off.</p>
+
+<p>When turned on, "READ_POINTER" will not return unless the new pointer
+value differs from the pointer value given as the argument to
+"READ_POINTER".  This makes the argument an input and an output
+argument.</p>
+
+<p>Again this feature can be turned on by creating a file called 
+<em>ringbuffer.ini</em> containing this line:
+<pre>
+sync
+</pre>
+See the note in the Stride section above about locating this
+file.</p>
+
+<p>This sync option can also be changed by using a subroutine call:
+<pre>
+SET_SYNC(BOOL onOff)
+</pre>
+where onOff is either "TRUE" or "FALSE".</p>
+
+<p>The sync setting actually used is displayed when running
+the test program <em>RingBuffer_SyncTest</em>.</p>

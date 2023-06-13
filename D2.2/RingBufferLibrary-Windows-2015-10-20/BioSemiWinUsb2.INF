@@ -1,0 +1,105 @@
+;=================== Version section ====================
+ 
+[Version] 
+Signature = "$Windows NT$" 
+Class = MyDeviceClass 
+ClassGuid={894A7460-A034-11d2-821E-444553540008}
+Provider = %ProviderName%
+DriverVer = 11/05/2009,1.0.0.0
+ 
+; ========== Manufacturer/Models sections ===========
+ 
+[Manufacturer] 
+%ProviderName% = MyDevice_WinUSB,NTx86,NTamd64
+ 
+[MyDevice_WinUSB.NTx86] 
+;******
+%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_04B4&PID_8613
+%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_0547&PID_1005
+;******
+ 
+[MyDevice_WinUSB.NTamd64] 
+;******
+%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_04B4&PID_8613
+%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_0547&PID_1005
+;******
+
+ 
+; ================ Source Media Section ======
+; note: SourceDisksFiles uses extensions x86 and amd64 not NTx86 and NTamd64
+
+[SourceDisksFiles.x86]
+WUDFUpdate_01009.dll=1
+WdfCoInstaller01009.dll=1
+winusbcoinstaller2.dll=1
+
+[SourceDisksFiles.amd64]
+WUDFUpdate_01009.dll=2
+WdfCoInstaller01009.dll=2
+winusbcoinstaller2.dll=2
+
+[SourceDisksNames]
+1 = ,,,\x86
+2 = ,,,\amd64
+
+; =================== Installation ===================
+ 
+[USB_Install] 
+Include=winusb.inf	; locate and read winusb.inf  
+Needs=WINUSB.NT		; imports directives(copyfiles & addreg)
+ 
+[USB_Install.HW] 
+AddReg=Dev_AddReg
+ 
+[USB_Install.Services] 
+Include=winusb.inf 
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+ 
+[USB_Install.Wdf] 
+KmdfService=WINUSB, WinUsb_Install
+UmdfDispatcher=WinUsb
+UmdfServiceOrder=WinUsb
+ 
+[USB_Install.CoInstallers] 
+AddReg=CoInstallers_AddReg 
+CopyFiles=CoInstallers_CopyFiles
+ 
+[WinUSB_Install] 
+KmdfLibraryVersion=1.9
+ 
+[WinUSB_ServiceInstall] 
+DisplayName = %WinUSB_SvcDesc% 
+ServiceType = 1 
+StartType = 3 
+ErrorControl = 1 
+ServiceBinary = %12%\WinUSB.sys
+ 
+[CoInstallers_AddReg] 
+HKR,,CoInstallers32,0x00010000,"WUDFUpdate_01009.dll","winusbcoinstaller2.dll","WdfCoInstaller01009.dll,WdfCoInstaller"
+ 
+[Dev_AddReg] 
+HKR,,DeviceInterfaceGUIDs,0x00010000,"{894A7460-A034-11d2-821E-444553540008}"
+
+[CoInstallers_CopyFiles] 
+WUDFUpdate_01009.dll
+WdfCoInstaller01009.dll
+winusbcoinstaller2.dll 
+ 
+[DestinationDirs] 
+CoInstallers_CopyFiles=11	;11=system dir (\windows\system32)
+
+; ========== ClassInstall sections =========== 
+
+[ClassInstall32] 
+AddReg=class_install_add_reg
+ 
+[class_install_add_reg] 
+HKR,,,,"MS WinUsb2 Driver" 
+HKR,,Icon,,"-20" 
+ 
+; =================== Strings ===================
+ 
+[Strings] 
+ProviderName="BioSemi" 
+USB\MyDevice.DeviceDesc="MS WinUsb2 driver for BioSemi Active Two" 
+WinUSB_SvcDesc="MS WinUsb2 driver for BioSemi Active Two"
