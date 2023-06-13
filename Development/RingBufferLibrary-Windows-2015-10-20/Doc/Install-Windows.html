@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Install and Test on Windows</title>
+<style>
+	h4 {color:green;}
+	pre {
+		background-color:lightgrey;
+		border:1px solid grey;
+		padding:10px;
+		margin:30px;
+	}
+</style>
+</head>
+<body lang="EN-US">
+
+<p>June 15, 2015</p>
+
+<h1>Install and Test on Windows</h1>
+
+<h2>Contents</h2>
+<ul>
+        <li><a href="#pre">Preamble</a></li>
+        <li><a href="#wcid">Install, with WCID Firmware</a></li>
+        <li><a href="#nowcid">Install, no WCID Firmware</a></li>
+        <li><a href="#manual">Manual Install</a></li>
+        <li><a href="#test">Testing</a></li>
+	<li><a href="#actiview">Merging with ActiView or Other Existing Program</a></li>
+        <li><a href="#client">Client/Server Feature</a></li>
+        <li><a href="#develop">Develop a Program</a></li>
+</ul>
+
+<a name="pre"></a>
+<h4>Preample</h4>
+
+<p>"RingBuffer" is the new name for the BioSemi library that was formerly called "Labview_DLL".
+The new name was chosen to remove any inference that the library comes from or, is dependent on, the
+National Instruments "LabVIEW" product.</p>
+
+<p>This software contains no kernel mode routines and runs entirely in user
+mode.</p>
+
+<p>However it does require a kernel mode driver "WinUsb" which is
+a standard component of Windows.  The installation described here is about how to
+tell Windows what driver to load when the BioSemi Usb Receiver's cable
+is plugged into the computer.</p>
+
+<p>The 2015 <em>RingBuffer</em> library uses the same Windows Usb driver (WinUsb) as
+that used by the previous <em>Labview_DLL.dll</em>.  This means that if the Windows
+Usb driver was installed for the previous version, there is no need to
+repeat THAT part of the install.  Instead skip directly to the
+<a href="#test">Testing</a>
+section below.</p>
+
+<a name="wcid"></a>
+<h4>Install, with WCID Firmware</h4>
+
+<p>The newest Usb Receiver firmware from BioSemi (March 2015) implements
+Microsoft's Windows Compatible ID feature (WCID).  This means that on
+Windows Vista and newer systems, the Usb receiver no longer requires any
+kernel driver installation by the user.</p>
+
+<p>When the Usb cable is plugged
+into the computer, Windows recognizes that the firmware uses the Microsoft
+WinUsb driver and loads that driver.  In this case, skip down to the
+<a href="#test">Testing</a>
+section below.</p>
+
+<a name="nowcid"></a>
+<h4>Install, no WCID Firmware</h4>
+
+<p>BioSemi doesn't provide an actual Windows driver but supplies only an INF 
+file that connects Microsoft's "WinUsb" driver with the BioSemi Receiver.</p>
+
+<p>Normally Windows 8 allows only signed drivers to be installed.  The
+signing requirement extends to the INF file as well as the actual driver.</p>
+
+<p>The BioSemiWinUsb2.INF file is not signed.</p>
+
+<p>For Windows 8 there is a workaround that has to be performed first to allow
+Windows 8 to accept the unsigned BioSemiWinUsb2 file.
+See this BioSemi web page for the instructions:
+<a href="http://www.biosemi.com/faq/install_USB_W8.htm"
+target=_blank">http://www.biosemi.com/faq/install_USB_W8.htm</a>.
+</p>
+
+<p>Then for all generations of Windows try this:
+<ul>
+	<li>Open a "Command Prompt" window and "cd" to the "RingBufferLibrary-Windows" directory.</li>
+	<br>
+	<li>Right click on the distributed file "BioSemiWinUsb2.INF".</li>
+	<br>
+	<li>Select "Install".</li>
+</ul>
+</p>
+
+<p>If this works, skip down to the <a href="#test">Testing</a> section below.</p>
+
+<p>Otherwise, follow the <a href="#manual">Manual Install</a>
+steps below.</p>
+
+<a name="manual"></a>
+<h4>Manual Install</h4>
+
+<p>This is a less automatic way to tell Windows to use driver "WinUsb" with the
+Biosemi Usb Receiver,</p>
+
+<p>Here are the usual sequence of displays and what you should chose
+for the various generations of Windows systems.</p>
+
+<h5>Vista, Windows7, Windows8</h5>
+<ul>
+<li>Open the Control Panel<br>
+Select: Device Manager</li>
+<br>
+<li>Plugin the Usb cable.<br>
+
+If the wrong driver is installed for this device, right click on the
+existing driver listed (you may have to expand a class to see the driver
+entry in the list), select the "Uninstall" menu item and a "Confirm
+Device Uninstall" window will appear.  Select "Delete the driver software
+for this device" and click "OK".  Pull out the Usb cable and re-insert it.
+If there is no existing driver, double click "Add Hardware" in the
+Control Panel.</li>
+</ul>
+
+<p>Now you should see the following sequence of displays:</p>
+<ul>
+<li>"Windows needs to install driver software for your Receiver01"<br>
+	Select "Locate and install driver software (recommended)"</li>
+<br>
+
+<li>After a short pause while it searches Windows Update you get:<br>
+
+"Insert the disk that came with your RECEIVER01"<br>
+	Select "I don't have the disk. Show me other options."</li>
+<br>
+
+<li>"Windows couldn't find software for your device."<br>
+	Select "Browse my computer for driver software (advanced)"</li>
+<br>
+
+<li>"Browse for driver software on your computer"<br>
+	Use "Browse" to select the directory with the "BioSemiWinUsb2.INF" file.</li>
+<br>
+
+<li>"Windows can't verify the publisher of this driver software"<br>
+	Select "Install this driver software anyway"</li>
+</ul>
+<p>Skip down to the <a href="#test">Testing</a> section below.</p>
+
+<h5>XP32 (i.e. XP)</h5>
+
+<ul>
+<li>Open the Control Panel<br>
+	Select: System, Hardware, Device Manager</li>
+<br>
+<li>Plugin the Usb cable.<br>
+
+If the Found New Hardware Wizard window doesn't appear, right click
+on the existing driver listed (you may have to expand the "Devices Class"
+entry in the list), select the "Update Driver" menu item and the
+Hardware Update Wizard window will appear.  If there is no existing
+driver, double click "Add Hardware" in the Control Panel.</li>
+<br>
+
+<li>Make the following selections:</li>
+<ul>
+	<li>"Can Windows connect to Windows Update to search for software?"<br>
+		Select "No, not this time".</li>
+<br>
+
+	<li>"What do you want the wizard to do?"<br>
+		Select "Install from a list or specific location (Advanced)."</li>
+<br>
+
+	<li>"Please choose your search and installation options."<br>
+		Select "Don't search. I will choose the driver to install."</li>
+<br>
+
+	<li>"Select the device driver you want to install for this hardware."<br>
+		Select a driver from the list shown or choose "Have Disk".</li>
+<br>
+
+	<li>"Install From Disk"<br>
+	Use "Browse" to select the directory with the "BioSemiWinUsb2.INF" file.</li>
+<br>
+</ul>
+</ul>
+
+<p>Skip down to the <a href="#test">Testing</a> section below.</p>
+
+<a name="test"></a>
+<h4>Testing</h4>
+
+<p>To test your install:
+<ul>
+	<li>Open a "Command Prompt" window and "cd" to the "RingBufferLibrary-Windows" directory.</li>
+	<br>
+	<li>"cd" to the subdirectory corresponding to the Operating System being
+	used (i.e. "Windows64" or "Windows32").</li>
+	<br>
+	<li>Run the program "RingBuffer_SyncTest" using this command:
+<pre>
+RingBuffer_SyncTest
+</pre>
+	</li>
+</ul>
+
+<p>This program checks that the 0xffffff00 sync words appear in all the
+right places in the input stream.  It stops with a message if they don't.</p>
+
+<p>There can be 3 command line parameters for this program:
+<ul>
+        <li>Ring buffer size, in 512 byte units.<br>
+Ring buffer size must start with a 'b' or 'B' and is expressed in units
+of 512 bytes.  The default if not given is b65536 for 32 Mbytes.
+</li>
+<br>
+        <li>Range of channels to request from a remote sample server.<br>
+The range of channels to request from a remote sample server must have a 'r'
+or 'R' prefix and be two numbers separated by a '-'.  The default is all
+sampled channels.  Note: the sync and status channels are always added.
+</li>
+<br>
+        <li>Time to run.<br>
+The time to run is in seconds.  The default if not given is 600 seconds
+(10 minutes).  If given as 0 there will be no time limit.
+</li>
+</ul>
+These parameters can be in any order or left out completely.</p>
+ 
+<p>Hitting any key when the program is running will stop the test run.</p>
+
+<p>Some performance improvement may be gained by using the library
+parameters explained at
+<a href="Tuning.html" target=_blank">Tuning</a>.</p>
+
+<a name="actiview"></a>
+<h4>Merging with ActiView or Other Existing Program</h4>
+
+<p>Note:<br>
+<ul>
+<li>At present, <em>ActiView</em> for Windows is available on the BioSemi download page:</br>
+<a href="http://www.biosemi.com/download.htm">
+http://www.biosemi.com/download.htm</a></li>
+
+<li>ActiView706 requires that the National Instruments LabVIEW Run Time
+engine 8.6.1 be installed:<br>
+See: <a href="http://ftp.ni.com/support/softlib/labview/labview_runtime/8.6.1/Windows/LVRTE861STD.exe">
+	http://ftp.ni.com/support/softlib/labview/labview_runtime/8.6.1/Windows/LVRTE861STD.exe</a></li>
+</ul>
+</p>
+
+<p>To merge this new <em>RingBuffer</em> library with an existing version of
+BioSemi's <em>ActiView</em> program or other existing acquisition application:
+<ul>
+	<li>Replace the existing library file <em>RingBuffer.dll</em> or <em>Labview_DLL.dll</em> (for <em>ActiView</em> usually in
+	the "data" directory) with the <em>RingBuffer</em> library file from this distribution.
+Be careful to use the bit-width library file that matches the application's
+bit-width.
+	<p>If the application is looking for a <em>Labview_DLL.dll</em>
+library, copy and rename the <em>RingBuffer.dll</em> file and use that instead.
+</p>
+</li>
+	<li>Insert the parameter file <em>ringbuffer.ini</em>
+	from this distribution into the directory containing the
+	application file.</li>
+</ul>
+</p>
+
+<a name="client"></a>
+<h4>Client/Server Feature</h4>
+
+<p>To try the client/server feature of the 2015 version of the ring buffer
+library or the Android sample App, see
+<a href="TryClientServer.html" target=_blank">Try Client/Server</a>.</p>
+
+<a name="develop"></a>
+<h4>Develop a Program</h4>
+
+<p>To develop your own acquisition program using the <em>RingBuffer</em> library,
+see
+<a href="RingBufferLibrary-API.html" target=_blank">RingBufferLibrary-API</a> for a description
+of the API's available.</p>
+
+<p>The distributed software was compiled in both 32 and 64 bit modes
+using Microsoft's Visual Studio 2013, Visual Studio Tools Command Prompt
+windows, command "nmake".  Testing was done on 64 bit Windows 7.
+</p>

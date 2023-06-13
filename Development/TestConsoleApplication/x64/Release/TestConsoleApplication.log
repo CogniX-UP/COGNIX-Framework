@@ -1,0 +1,11 @@
+﻿  0 File(s) copied
+  TestConsoleApplication.cpp
+  biosemi_io.cpp
+C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\TestConsoleApplication\biosemi_io.cpp(377,34): warning C4018: '>=': signed/unsigned mismatch
+C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\TestConsoleApplication\biosemi_io.cpp(380,34): warning C4018: '>=': signed/unsigned mismatch
+  Generating code
+  0 of 290 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  TestConsoleApplication.vcxproj -> C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\x64\Release\TestConsoleApplication.exe

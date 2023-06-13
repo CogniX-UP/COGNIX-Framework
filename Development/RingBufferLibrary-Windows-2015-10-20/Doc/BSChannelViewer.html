@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Android App BSChannelViewer</title>
+<style>
+	h4 {color:green;}
+	pre {
+		background-color:lightgrey;
+		border:1px solid grey;
+		padding:10px;
+		margin:30px;
+	}
+</style>
+</head>
+<body lang="EN-US">
+
+<p>June 25, 2015</p>
+
+<h2>Android App BSChannelViewer</h2>
+
+<p>This document describes a sample Android client App <em>BSChannelViewer</em>.
+It is intended as a proof of concept to illustrate what can be done with the
+2015 <em>RingBuffer</em> library's client/server sample streaming feature.
+For full details on how to setup a server to communicate with this client
+see <a href="TryClientServer.html" target=_blank">Try Client/Server</a>.
+</p>
+<p>The main screen displayed by this App is shown here, in portrait orientation
+mode:</p>
+
+<img SRC="device-2015-07-01-194152.png" alt="Main Screen" width=400 height=640>
+
+<h4>Lower or Right Display Panel</h4>
+
+<p>The lower (or right in landscape mode) part of the screen provides a continuous
+trace of one of the channels being sampled on the server computer.</p>
+
+<ul>
+	<li>Channel selection.<br>
+	<p>The channel being displayed can be stepped numerically by using <em>fling</em>
+	gestures over the display panel; right-to-left steps the channel number up,
+	left-to-right steps down.</p>
+
+<p>The channel being displayed can also be chosen more directly by touching the
+desired channel in the top (or left in landscape mode) window.</p>
+	</li>
+	<li>Amplitude scale.<br>
+<p>The trace window can be re-scaled in amplitude by using a <em>double tap</em> gesture
+in the panel.  Each <em>double tap</em> steps through a set of defined amplitude
+scales.</p>
+	</li>
+	<li>Time scale.<br>
+<p>The time scale can be changed by using two fingers and moving them horizontally
+closer or farther apart.  This steps through a set of defined time
+scales.</p>
+	</li>
+	<li>Pause updates.<br>
+<p>Screen updates can be paused by using a <em>fling down</em> gesture.
+Use a <em>fling up</em> to restart updates.</p>
+</li>
+	<li>Title line.<br>
+	<p>The title line above the trace panel displays:
+	<ul>
+		<li>The number of channels being sampled on the server.</li>
+		<li>The approximate rate at which the server's Usb "ring buffer" is being filled, in samples/channel/second.</li>
+		<li>The channel being plotted.</li>
+		<li>The set of channels currently being transferred from the server.</li>
+		<li>The current rate at which samples are being received by this client, in samples/channel/second.</li>
+		<li>The number of re-syncs performed, usually due to limited bandwidth.</li>
+	</ul>
+</ul>
+
+<p>The main screen displayed by this App is shown here, with "cap" electrodes
+displayed, in landscape orientation
+mode:</p>
+
+<img SRC="device-2015-07-01-194243.png" alt="Main Screen" width=640 height=400>
+
+<h4>Upper or Left Display Panel</h4>
+
+<p>The upper (or left) display shows channel offsets for the channels currently being
+transferred from the server.  This display is similar to the channel offset display
+in <em>ActiView</em>.</p>
+<ul>
+	<li>Channel selection.<br>
+	<p>If you touch a channel that is not being transferred (and
+displayed), a new set of channels is requested from the server and that channel
+becomes the channel displayed in the lower (or right) trace panel.</p>
+</li>
+<li>Amplitude scale.<br>
+<p>The display can be re-scaled by using a <em>double tap</em> gesture in the
+window.</p>
+</li>
+<li>Cap layout.<br>
+<p>The upper (or left) display can be changed to a "cap layout" display by touching the
+"head" icon in the upper right corner of the screen.  In the "cap" display, channel
+offset is indicated by a colour ring around the electrode.  Again, only the channels
+currently being transmitted from the server have this ring.</p>
+</li>
+<li>Channel selection.<br>
+<p>If you touch an electrode that is not being transferred, a new set of channels is
+requested from the server and that electrode (channel) is displayed in the lower
+(or right) panel.</p>
+</li>
+<li>Magnification.<br>
+<p>This display can be magnified by using a <em>double tap</em> gesture.
+When magnified, the window can be scrolled by moving a finger around on the
+display.</p>
+</li>
+</ul>
+
+<p>The main screen displayed by this App is shown here, with "cap" electrodes
+labeled rather than numbered, in landscape orientation mode:</p>
+
+<img SRC="device-2015-07-01-194330.png" alt="Main Screen" width=640 height=400>
