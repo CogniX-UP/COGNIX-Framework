@@ -18,12 +18,18 @@
     <ClCompile Include="TestConsoleApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="biosemi_io.cpp">
+    <ClCompile Include="BiosemiEEG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LabStreamEEG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="biosemi_io.h">
+    <ClInclude Include="BiosemiEEG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LabStreamEEG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="biosemi_io.cpp" />
+    <ClCompile Include="BiosemiEEG.cpp" />
+    <ClCompile Include="LabStreamEEG.cpp" />
     <ClCompile Include="TestConsoleApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="biosemi_io.h" />
+    <ClInclude Include="BiosemiEEG.h" />
+    <ClInclude Include="LabStreamEEG.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -111,11 +113,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,13 +130,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>xcopy /y /d "DLL\Win64\RingBuffer.dll" "$(OutDir)"</Command>

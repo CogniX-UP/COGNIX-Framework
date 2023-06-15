@@ -1,8 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\TestConsoleApplication"
+    "\\TestConsoleApplication\\DLL\\Win64"
   ],
-  "SelectedNode": "\\TestConsoleApplication\\TestConsoleApplication.cpp",
+  "SelectedNode": "\\TestConsoleApplication.sln",
   "PreviewInSolutionExplorer": false
 }

@@ -1,26 +1,31 @@
 #include <iostream>
-#include "biosemi_io.h"
+#include "BiosemiEEG.h"
+#include "LabStreamEEG.h"
+//This is a test app to see if everything is working correctly
 int main()
 {
     std::cout << "Hello World!\n";
-    auto b = biosemi_io();
-    std::cout << b.battery_low() << "\n";
-    std::cout << b.is_mk2() << "\n";
-    std::cout << b.speed_mode() << "\n";
+    //Connect to the biosemi io
+    auto b = BiosemiEEG();
+    std::cout << b.HasLowBattery() << "\n";
+    std::cout << b.IsMk2() << "\n";
+    std::cout << b.SpeedMode() << "\n";
     
     for (auto str : b.channel_labels())
         std::cout << str << " ";
 
-    auto buffer = biosemi_io::chunk_t();
+    auto buffer = BiosemiEEG::Chunk();
 
     while (1) {
-        b.get_chunk(buffer);
+        b.GetChunk(buffer);
         if (buffer.size() > 0) {
             for (auto sample : buffer)
                 for (auto rawValue : sample)
                     std::cout << rawValue << "\n";
         }
     }
+
+    lsl::stream_info info(sd)
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
