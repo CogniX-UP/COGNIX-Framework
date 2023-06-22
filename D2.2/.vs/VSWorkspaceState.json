@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\TestConsoleApplication\\DLL\\Win64"
+    "\\Dependencies\\Lab Streaming Layer",
+    "\\Dependencies\\Lab Streaming Layer\\Windows 64",
+    "\\Dependencies\\Lab Streaming Layer\\Windows 64\\include",
+    "\\TestConsoleApplication"
   ],
   "SelectedNode": "\\TestConsoleApplication.sln",
   "PreviewInSolutionExplorer": false

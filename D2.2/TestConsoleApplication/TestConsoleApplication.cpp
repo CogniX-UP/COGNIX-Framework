@@ -4,7 +4,6 @@
 //This is a test app to see if everything is working correctly
 int main()
 {
-    std::cout << "Hello World!\n";
     //Connect to the biosemi io
     auto b = BiosemiEEG();
     std::cout << b.HasLowBattery() << "\n";
@@ -25,7 +24,6 @@ int main()
         }
     }
 
-    lsl::stream_info info(sd)
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

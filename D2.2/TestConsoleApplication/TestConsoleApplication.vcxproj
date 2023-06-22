@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BiosemiEEG.h" />
+    <ClInclude Include="Fixation.h" />
     <ClInclude Include="LabStreamEEG.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -85,6 +86,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -99,6 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
