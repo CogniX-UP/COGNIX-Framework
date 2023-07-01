@@ -1,14 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\D2.2",
-    "\\D2.2\\TestConsoleApplication",
-    "\\D2.2\\TestConsoleApplication\\Decision Maker\\include\\Models",
-    "\\D2.2\\TestConsoleApplication\\Decision Maker\\src",
-    "\\D2.2\\TestConsoleApplication\\Decision Maker\\src\\Models",
-    "\\D2.2\\TestConsoleApplication\\Eye Gaze\\include",
-    "\\D2.2\\TestConsoleApplication\\Eye Gaze\\src"
+    "\\CogniX",
+    "\\CogniX\\TestConsoleApplication",
+    "\\CogniX\\TestConsoleApplication\\Decision Maker",
+    "\\CogniX\\TestConsoleApplication\\Decision Maker\\include",
+    "\\CogniX\\TestConsoleApplication\\Decision Maker\\src"
   ],
-  "SelectedNode": "\\D2.2\\TestConsoleApplication\\Eye Gaze",
   "PreviewInSolutionExplorer": false
 }
