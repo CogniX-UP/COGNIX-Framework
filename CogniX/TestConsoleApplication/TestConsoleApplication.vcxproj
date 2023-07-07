@@ -19,14 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BiosemiEEG.cpp" />
-    <ClCompile Include="LabStreamEEG.cpp" />
     <ClCompile Include="TestConsoleApplication.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="BiosemiEEG.h" />
-    <ClInclude Include="Fixation.h" />
-    <ClInclude Include="LabStreamEEG.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -86,12 +79,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)External Dependencies\Header Only;$(SolutionDir)Dependencies\Lab Streaming Layer\include;$(SolutionDir)Dependencies\Header Only</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>;$(SolutionDir)Dependencies/Lab Streaming Layer/Windows 64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,7 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)External Dependencies\Header Only;$(SolutionDir)Dependencies\Lab Streaming Layer\include;$(SolutionDir)Dependencies\Header Only</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -110,6 +104,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>;$(SolutionDir)Dependencies/Lab Streaming Layer/Windows 64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,13 +113,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\Test\TestConsoleApplication\TestConsoleApplication;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only;$(SolutionDir)Dependencies\Lab Streaming Layer\include;$(SolutionDir)Dependencies\Header Only</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64;$(SolutionDir)Dependencies/Lab Streaming Layer/Windows 64</AdditionalLibraryDirectories>
       <AdditionalDependencies>lsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Header Only;C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\DLL;%(AdditionalIncludeDirectories);$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64\include;$(SolutionDir)External Dependencies\Header Only;$(SolutionDir)Dependencies\Lab Streaming Layer\include;$(SolutionDir)Dependencies\Header Only</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -144,7 +139,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Lab Streaming Layer\Windows 64;$(SolutionDir)Dependencies/Lab Streaming Layer/Windows 64</AdditionalLibraryDirectories>
       <AdditionalDependencies>lsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>

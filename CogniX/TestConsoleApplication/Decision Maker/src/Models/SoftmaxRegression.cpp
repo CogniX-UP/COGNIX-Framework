@@ -36,10 +36,6 @@ double DecisionMaking::SoftmaxRegression::CrossValidate(size_t k, std::vector<st
 			auto cv = mlpack::SimpleCV<mlpack::SoftmaxRegression, mlpack::F1<mlpack::AverageStrategy::Macro>>(0.2, data, responses);
 			return cv.Evaluate();
 		}
-		case BaseModel::MSE: {
-			SimpleCV<mlpack::SoftmaxRegression, mlpack::MSE> cv(0.2, data, responses);
-			return cv.Evaluate();
-		}
 		case BaseModel::Precision:
 		{
 			SimpleCV<mlpack::SoftmaxRegression, mlpack::Precision<mlpack::AverageStrategy::Macro>> cv(0.2, data, responses);
@@ -60,10 +56,6 @@ double DecisionMaking::SoftmaxRegression::CrossValidate(size_t k, std::vector<st
 		case BaseModel::F1:
 		{
 			mlpack::KFoldCV<mlpack::SoftmaxRegression, mlpack::F1<mlpack::AverageStrategy::Macro>> cv(k, data, labels, numClasses);
-			return cv.Evaluate();
-		}
-		case BaseModel::MSE: {
-			mlpack::KFoldCV<mlpack::SoftmaxRegression, mlpack::MSE> cv(k, data, labels, numClasses);
 			return cv.Evaluate();
 		}
 		case BaseModel::Precision:

@@ -34,10 +34,6 @@ double DecisionMaking::RandomForestModel::CrossValidate(uint32_t k, std::vector<
 			auto cv = mlpack::SimpleCV<mlpack::RandomForest<>, mlpack::F1<mlpack::AverageStrategy::Macro>>(0.2, data, responses);
 			return cv.Evaluate();
 		}
-		case BaseModel::MSE: {
-			SimpleCV<RandomForest<>, mlpack::MSE> cv(0.2, data, responses);
-			return cv.Evaluate();
-		}
 		case BaseModel::Precision:
 		{
 			SimpleCV<RandomForest<>, mlpack::Precision<mlpack::AverageStrategy::Macro>> cv(0.2, data, responses);
@@ -58,10 +54,6 @@ double DecisionMaking::RandomForestModel::CrossValidate(uint32_t k, std::vector<
 		case BaseModel::F1:
 		{
 			mlpack::KFoldCV<mlpack::RandomForest<>, mlpack::F1<mlpack::AverageStrategy::Macro>> cv(k, data, labels);
-			return cv.Evaluate();
-		}
-		case BaseModel::MSE: {
-			mlpack::KFoldCV<mlpack::RandomForest<>, mlpack::MSE> cv(k, data, labels);
 			return cv.Evaluate();
 		}
 		case BaseModel::Precision:

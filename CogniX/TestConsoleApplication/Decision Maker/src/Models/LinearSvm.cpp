@@ -35,10 +35,6 @@ double DecisionMaking::LinearSvm::CrossValidate(size_t k, std::vector<std::vecto
 			auto cv = mlpack::SimpleCV<mlpack::LinearSVM<>, mlpack::F1<mlpack::AverageStrategy::Macro>>(0.2, data, responses);
 			return cv.Evaluate();
 		}
-		case BaseModel::MSE: {
-			SimpleCV<mlpack::LinearSVM<>, mlpack::MSE> cv(0.2, data, responses);
-			return cv.Evaluate();
-		}
 		case BaseModel::Precision:
 		{
 			SimpleCV<mlpack::LinearSVM<>, mlpack::Precision<mlpack::AverageStrategy::Macro>> cv(0.2, data, responses);
@@ -59,10 +55,6 @@ double DecisionMaking::LinearSvm::CrossValidate(size_t k, std::vector<std::vecto
 		case BaseModel::F1:
 		{
 			mlpack::KFoldCV<mlpack::LinearSVM<>, mlpack::F1<mlpack::AverageStrategy::Macro>> cv(k, data, labels, numClasses);
-			return cv.Evaluate();
-		}
-		case BaseModel::MSE: {
-			mlpack::KFoldCV<mlpack::LinearSVM<>, mlpack::MSE> cv(k, data, labels, numClasses);
 			return cv.Evaluate();
 		}
 		case BaseModel::Precision:
