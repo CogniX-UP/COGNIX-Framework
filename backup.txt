@@ -1,0 +1,227 @@
+<!-- <Page x:Class="CognixUI.Presentation.MainPage"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:CogniX_UI"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	Background="{ThemeResource BackgroundBrush}">
+
+    <StackPanel HorizontalAlignment="Center"
+				VerticalAlignment="Center">
+        <TextBlock AutomationProperties.AutomationId="HelloTextBlock"
+				   Text="Hello ds" />
+    </StackPanel>
+</Page>-->
+<Page
+    x:Class="CognixUI.Presentation.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:CognixUI.Presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:uen="using:Uno.Extensions.Navigation.UI"
+    xmlns:uer="using:Uno.Extensions.Reactive.UI"
+    xmlns:um="using:Uno.Material"
+    xmlns:utu="using:Uno.Toolkit.UI"
+    Background="{ThemeResource BackgroundBrush}"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <x:String x:Key="Icon_Add">F1 M 12 6.857142857142857 L 6.857142857142857 6.857142857142857 L 6.857142857142857 12 L 5.142857142857142 12 L 5.142857142857142 6.857142857142857 L 0 6.857142857142857 L 0 5.142857142857142 L 5.142857142857142 5.142857142857142 L 5.142857142857142 0 L 6.857142857142857 0 L 6.857142857142857 5.142857142857142 L 12 5.142857142857142 L 12 6.857142857142857 Z</x:String>
+    </Page.Resources>
+    <utu:AutoLayout CornerRadius="15">
+        <StackPanel
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Background="Black"
+            Orientation="Horizontal">
+            <Border
+                Width="96"
+                Height="43"
+                Margin="13,5,0,5"
+                CornerRadius="15">
+                <Image Source="Assets/Images/biosemiLogo.gif" Stretch="UniformToFill" />
+            </Border>
+            <TextBlock
+                Margin="25,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="25"
+                Foreground="White"
+                SelectionHighlightColor="White">
+                EEG ActiveTwo Acquisition
+            </TextBlock>
+            <Image
+                Width="235"
+                Height="49"
+                Margin="250,0,0,0"
+                Source="Assets/Images/cognixBrand.png" />
+        </StackPanel>
+        <utu:AutoLayout
+            Width="551"
+            Height="435"
+            Margin="385,77,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            utu:AutoLayout.IsIndependentLayout="True">
+            <Rectangle
+                Width="533"
+                Height="420"
+                Margin="8,7,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                utu:AutoLayout.IsIndependentLayout="True"
+                Fill="LightGray"
+                RadiusX="3"
+                RadiusY="3" />
+            <TextBlock
+                Margin="32,15,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                utu:AutoLayout.IsIndependentLayout="True"
+                Text="Log Output" />
+        </utu:AutoLayout>
+        <utu:AutoLayout
+            Width="362"
+            Height="153"
+            Margin="19,95,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            utu:AutoLayout.IsIndependentLayout="True"
+            CornerRadius="10">
+            <utu:AutoLayout
+                Width="342"
+                Height="99"
+                Margin="2,36,18,18"
+                Padding="10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                utu:AutoLayout.IsIndependentLayout="True"
+                CornerRadius="10"
+                Spacing="10">
+                <Rectangle
+                    Width="448"
+                    Height="177"
+                    Margin="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True" />
+                <CheckBox
+                    Width="75"
+                    Margin="234,49,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX8" />
+                <CheckBox
+                    Width="75"
+                    Margin="159,49,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX7" />
+                <CheckBox
+                    Width="75"
+                    Margin="86,49,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX6" />
+                <CheckBox
+                    Width="75"
+                    Margin="11,49,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX5" />
+                <CheckBox
+                    Width="75"
+                    Margin="234,13,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX4" />
+                <CheckBox
+                    Width="75"
+                    Margin="159,13,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX3" />
+                <CheckBox
+                    Width="75"
+                    Margin="84,13,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX2" />
+                <CheckBox
+                    Width="75"
+                    Margin="9,13,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    utu:AutoLayout.IsIndependentLayout="True"
+                    Content="EX1" />
+            </utu:AutoLayout>
+            <TextBlock
+                Margin="2,11,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                utu:AutoLayout.IsIndependentLayout="True"
+                Text="Reference Channels" />
+        </utu:AutoLayout>
+        <utu:AutoLayout
+            Width="328"
+            Height="61"
+            Margin="21,314,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            utu:AutoLayout.IsIndependentLayout="True">
+            <ComboBox
+                Width="286"
+                Margin="42,0,0,5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                utu:AutoLayout.IsIndependentLayout="True"
+                PlaceholderText="Resample Frequency">
+
+                <x:String>256 Hz</x:String>
+                <x:String>512 Hz</x:String>
+                <x:String>1024 Hz</x:String>
+            </ComboBox>
+            <CheckBox
+                Width="42"
+                Margin="0,13,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                utu:AutoLayout.IsIndependentLayout="True" />
+        </utu:AutoLayout>
+        <ComboBox
+            Width="328"
+            Margin="21,241,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            utu:AutoLayout.IsIndependentLayout="True"
+            PlaceholderText="Channel Subset">
+
+            <x:String>All</x:String>
+            <x:String>A1-A32</x:String>
+            <x:String>B1-B32</x:String>
+            <x:String>C1-C32</x:String>
+            <x:String>D1-D32</x:String>
+            <x:String>E1-E32</x:String>
+        </ComboBox>
+        <utu:AutoLayout
+            Margin="845,526,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            utu:AutoLayout.IsIndependentLayout="True"
+            Orientation="Horizontal">
+            <Button
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="Link"
+                CornerRadius="5" />
+        </utu:AutoLayout>
+    </utu:AutoLayout>
+</Page>
