@@ -1,0 +1,10 @@
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Decision Maker\src\mlpack ext\MlPackUtil.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\MlPackUtil.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Decision Maker\src\Models\LinearSvm.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\LinearSvm.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Decision Maker\src\Models\RandomForest.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\RandomForest.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Decision Maker\src\Models\SoftmaxRegression.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\SoftmaxRegression.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\EEG\src\BiosemiEEG.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\BiosemiEEG.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\EEG\src\LabStreamEEG.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\LabStreamEEG.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Eye Gaze\src\Features.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\Features.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\Cognix Code\Eye Gaze\src\JSON Importers\RapidJsonEyeImporter.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\RapidJsonEyeImporter.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\CogniX_T2.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\CogniX_T2.obj
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\EEG_Receiver.cpp;C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\EEG_Receiver.obj
