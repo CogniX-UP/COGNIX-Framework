@@ -1,17 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\CogniX",
-    "\\CogniX\\Dependencies",
-    "\\CogniX\\Dependencies\\Lab Streaming Layer",
-    "\\CogniX\\Dependencies\\Lab Streaming Layer\\Windows 64",
-    "\\CogniX\\TestConsoleApplication",
-    "\\CogniX\\TestConsoleApplication\\Decision Maker",
-    "\\CogniX\\TestConsoleApplication\\Decision Maker\\include",
-    "\\CogniX\\TestConsoleApplication\\Decision Maker\\include\\Models",
-    "\\CogniX\\TestConsoleApplication\\Decision Maker\\src",
-    "\\CogniX\\TestConsoleApplication\\Decision Maker\\src\\Models"
+    "\\CogniX_T2",
+    "\\CogniX_T2\\Cognix Code"
   ],
-  "SelectedNode": "\\CogniX\\TestConsoleApplication\\Decision Maker\\include\\ModelFactory.hpp",
+  "SelectedNode": "\\CogniX_T2\\CogniX_T2.sln",
   "PreviewInSolutionExplorer": false
 }

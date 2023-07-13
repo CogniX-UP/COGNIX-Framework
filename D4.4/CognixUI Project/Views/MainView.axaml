@@ -1,0 +1,120 @@
+<UserControl
+    x:Class="CognixUI.Views.MainView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:CognixUI.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainViewModel"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <!--
+            This onl sets the DataContext for the previewer in an IDE,
+            to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs)
+        -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <StackPanel>
+        <!--  Tittle bar  -->
+        <Grid Background="Black" ColumnDefinitions="Auto, *, Auto">
+            <Border
+                Grid.Column="0"
+                Width="96"
+                Height="43"
+                ClipToBounds="True"
+                CornerRadius="15">
+                <Image Source="/Assets/Images/biosemiLogo.gif" Stretch="UniformToFill" />
+            </Border>
+            <StackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <Label
+                    FontSize="25"
+                    FontWeight="Black"
+                    Foreground="White">
+                    EEG ActiveTwo Acquisition
+                </Label>
+            </StackPanel>
+            <Image
+                Grid.Column="2"
+                Width="235"
+                Height="49"
+                Source="/Assets/Images/cognixBrand.png" />
+        </Grid>
+        <Grid ColumnDefinitions="Auto, Auto">
+            <!--  LEFT PANEL  -->
+            <StackPanel
+                Grid.Row="0"
+                Margin="15,0,15,0"
+                Orientation="Vertical"
+                Spacing="15">
+                <StackPanel Orientation="Vertical">
+                    <Label FontWeight="Bold">References</Label>
+                    <Border
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                        <Grid
+                            Margin="5"
+                            ColumnDefinitions="Auto, Auto, Auto, Auto"
+                            RowDefinitions="Auto, Auto">
+                            <CheckBox Grid.Row="0" Grid.Column="0">EX1</CheckBox>
+                            <CheckBox Grid.Row="0" Grid.Column="1">EX2</CheckBox>
+                            <CheckBox Grid.Row="0" Grid.Column="2">EX3</CheckBox>
+                            <CheckBox Grid.Row="0" Grid.Column="3">EX4</CheckBox>
+                            <CheckBox Grid.Row="1" Grid.Column="0">EX5</CheckBox>
+                            <CheckBox Grid.Row="1" Grid.Column="1">EX6</CheckBox>
+                            <CheckBox Grid.Row="1" Grid.Column="2">EX7</CheckBox>
+                            <CheckBox Grid.Row="1" Grid.Column="3">EX8</CheckBox>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label FontWeight="Bold">Channels Subset</Label>
+                    <ComboBox PlaceholderText="Channel Subset">
+
+                        <x:String>All</x:String>
+                        <x:String>A1-A32</x:String>
+                        <x:String>B1-B32</x:String>
+                        <x:String>C1-C32</x:String>
+                        <x:String>D1-D32</x:String>
+                        <x:String>E1-E32</x:String>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label FontWeight="Bold">Resample</Label>
+                    <ComboBox PlaceholderText="Resample Frequency">
+
+                        <x:String>256 Hz</x:String>
+                        <x:String>512 Hz</x:String>
+                        <x:String>1024 Hz</x:String>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+            <!--  RIGHT PANEL  -->
+            <StackPanel Grid.Column="1" Spacing="5">
+                <StackPanel>
+                    <Label FontWeight="Bold">Log</Label>
+                    <Border
+                        Width="600"
+                        Height="400"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        ClipToBounds="True"
+                        CornerRadius="5">
+                        <TextBlock Background="Gray">
+                            Output
+                        </TextBlock>
+                    </Border>
+                    <Button HorizontalAlignment="Right">
+                        Link
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>

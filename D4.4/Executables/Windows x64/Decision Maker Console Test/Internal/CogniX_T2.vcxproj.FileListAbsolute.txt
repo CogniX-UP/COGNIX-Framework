@@ -1,0 +1,8 @@
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\CogniX_T2.vcxproj.CopyComplete
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\CogniX_T2.exe
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\liblapack.dll
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\libgcc_s_seh-1.dll
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\libwinpthread-1.dll
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\libgfortran-5.dll
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\libquadmath-0.dll
+C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\openblas.dll
