@@ -80,7 +80,7 @@ void LabStreamEEG::SendData()
 	//TODO change this later for specific channels
 
 	int outChannels = eeg.AllChannelCount();
-	int inSamples = rawChunk.size();
+	auto inSamples = rawChunk.size();
 
 	if (inSamples <= 0)
 		return;
@@ -88,11 +88,11 @@ void LabStreamEEG::SendData()
 	
 	//Scale to microvolts
 	scaledChunk.resize(rawChunk.size());
-	for (int i = 0; i < outChannels; i++) {
+	for (auto i = 0; i < outChannels; i++) {
 		scaledChunk[i].resize(inSamples);
 		
 		bool isTrigger = false; //TODO add a way to find if its the trigger
-		float scaleFactor = isTrigger ? 256 : 256 * 0.03125;
+		float scaleFactor = isTrigger ? 256.0f : 256.0f * 0.03125f;
 		for (int j = 0; i < inSamples; j++) {
 			scaledChunk[i][j] = rawChunk[i][j] / scaleFactor;
 		}

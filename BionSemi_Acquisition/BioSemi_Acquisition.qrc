@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/BionSemi_Acquisition">
+        <file>icons/brand_no_words.png</file>
+        <file>icons/logo_small1.gif</file>
+    </qresource>
+</RCC>

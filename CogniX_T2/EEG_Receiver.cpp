@@ -14,7 +14,7 @@ void writePaddedString(std::ofstream& file, const std::string& str, int length) 
 
 //Write the BDF metadata, the first 256 bytes.
 void writeBDFMetadata(std::ofstream& file, const std::string& patient, const std::string& date,
-	const std::string& time, const std::vector<std::string> &labels, int sampleRate) {
+	const std::string& time, const std::vector<std::string> &labels, double sampleRate) {
 	file.write("255", 1);
 	writePaddedString(file, "BIOSEMI", 7);
 	writePaddedString(file, patient, 80);
@@ -71,7 +71,7 @@ void writeBDFMetadata(std::ofstream& file, const std::string& patient, const std
  * This application must be run after the BioSemi Link Console Application has started sending data
  * This was used as a test to validate the CogniX API.
  */
-int main1(int argc, char* argv[]) {
+int main2(int argc, char* argv[]) {
 	std::string field, value;
 
 	field = "BioSemi";

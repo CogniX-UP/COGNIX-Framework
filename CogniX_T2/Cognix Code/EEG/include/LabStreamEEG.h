@@ -68,11 +68,11 @@ public:
 
 	//Synchronization meta-data
 	const float 
-		offsetMean = 0.00772,
-		offsetRms = 0.000070,
-		offsetMedian = 0.00772,
-		offset5Centile = 0.00764,
-		offset95Centile = 0.00783;
+		offsetMean = 0.00772f,
+		offsetRms = 0.000070f,
+		offsetMedian = 0.00772f,
+		offset5Centile = 0.00764f,
+		offset95Centile = 0.00783f;
 private:
 	lsl::stream_info streamInfo;
 	lsl::stream_outlet *outlet;

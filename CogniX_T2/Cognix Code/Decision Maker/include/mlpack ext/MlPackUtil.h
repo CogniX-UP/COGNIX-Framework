@@ -1,7 +1,6 @@
 #pragma once
-#include<mlpack/mlpack.hpp>
 #include<vector>
-
+#include <mlpack/core/math/math.hpp>
 //Used to fill an armadillo matrix from a vector of observations
 void FillArmaMat(std::vector<double> &observations, size_t featureLength, arma::mat& matrix);
 //Used to fill an armadillo feature vec from a feature vector

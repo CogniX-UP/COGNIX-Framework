@@ -1,3 +1,0 @@
--DCMAKE_TOOLCHAIN_FILE=C:/Users/salok/Desktop/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-Install-Package "vcpkg.C.Users.salok.Documents.GitHub.COGNIXFramework.vcpkg.vcpkg" -Source "C:\Users\salok\Documents\GitHub\COGNIX-Framework\vcpkg\vcpkg"

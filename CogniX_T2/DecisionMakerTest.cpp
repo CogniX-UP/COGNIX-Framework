@@ -1,7 +1,6 @@
 #include <LabStreamEEG.h>
 #include <string.h>
 #include <iostream>
-#include <mlpack/mlpack.hpp>
 #include <mlpack ext/MlPackUtil.h>
 #include <mlpack/methods/linear_svm/linear_svm.hpp>
 #include <Models/LinearSvm.hpp>

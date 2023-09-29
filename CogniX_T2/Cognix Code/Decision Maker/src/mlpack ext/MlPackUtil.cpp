@@ -1,6 +1,5 @@
 #pragma once
 #include <mlpack ext/MlPackUtil.h>
-#include <mlpack/mlpack.hpp>
 #include <vector>
 
 //Used to fill an armadillo matrix from a vector of observations
