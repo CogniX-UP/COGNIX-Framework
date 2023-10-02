@@ -2,6 +2,8 @@
 #define BIOSEMI_IO_H
 #include <vector>
 #include <string>
+#include <functional>
+#include <memory>
 
 #ifdef _WIN32
 #define BIOSEMI_LINKAGE __cdecl
@@ -22,13 +24,14 @@ public:
 	// shut down amplifier connection
 	~BiosemiEEG();
 
+	void ConnectAmplifier();
 	// get a chunk of raw data
 	void GetChunk(Chunk& result);
 
 	// get channel names
-	const std::vector<std::string>& channel_labels() const { return channel_labels_; }
+	const std::vector<std::string>& channel_labels() const { return channelLabels; }
 	// get channel types (Sync, Trigger, EEG, EXG,
-	const std::vector<std::string>& channel_types() const { return channel_types_; }
+	const std::vector<std::string>& channel_types() const { return channelTypes; }
 
 	// query amplifier parameters
 	bool IsMk2() const { return is_mk2_; }
@@ -42,6 +45,7 @@ public:
 	int ExgChannelCount() const { return nbexg_; }
 	int AuxChannelCount() const { return nbaux_; }
 	int AibChannelCount() const { return nbaib_; }
+	void SetLogCallback(std::function<void(const std::string&)>);
 
 private:
 	// function handle types for the library IO
@@ -51,6 +55,9 @@ private:
 	typedef int (BIOSEMI_LINKAGE* READ_POINTER_t)(void*, unsigned*);
 	typedef int (BIOSEMI_LINKAGE* CLOSE_DRIVER_ASYNC_t)(void*);
 
+	//log callback
+	std::function<void(std::string)> logCallback = nullptr;
+	void InvokeLog(const std::string &txt);
 	// amplifier parameters
 	bool is_mk2_;       // whether the amp is a MK2 amplifier
 	int speed_mode_;    // amplifier speed mode
@@ -64,15 +71,16 @@ private:
 	int nbchan_;        // total number of channels
 	bool battery_low_;  // whether the battery is low
 
-	// vector of channel labels (in BioSemi naming scheme)
-	std::vector<std::string> channel_labels_;
-	// vector of channel types (in LSL Semi naming scheme)
-	std::vector<std::string> channel_types_;
-
 	// ring buffer pointer (from the driver)
-	uint32_t* ring_buffer_;
-	int last_idx_;
+	std::unique_ptr<uint32_t> ringBuffer;
+	// vector of channel labels (in BioSemi naming scheme)
+	std::vector<std::string> channelLabels;
+	// vector of channel types (in LSL Semi naming scheme)
+	std::vector<std::string> channelTypes;
 
+	
+	
+	int last_idx_;
 	// DLL handle
 	void* hDLL_;
 	// connection handle

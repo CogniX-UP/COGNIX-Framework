@@ -14,14 +14,16 @@ LabStreamEEG::LabStreamEEG(int channelCount)  {
 		.append_child_value("offset_5_centile", std::to_string(LabStreamEEG::offset5Centile))
 		.append_child_value("offset_95_centile", std::to_string(LabStreamEEG::offset95Centile));
 	
-	//This may be needed later
-	outlet = new lsl::stream_outlet(streamInfo);
 }
 LabStreamEEG::~LabStreamEEG()
 {
-	delete outlet;
+	if (outlet)
+		delete outlet;
 }
 
+void LabStreamEEG::StartStream() {
+	outlet = new lsl::stream_outlet(streamInfo);
+}
 void LabStreamEEG::AppendChannelMetadata(const std::vector<std::string>& channels, const std::vector<std::string>& types, const std::unordered_map<std::string, std::vector<std::string>>& locmap)
 {
 	auto chanInfo = streamInfo.desc().append_child("channels");
@@ -99,8 +101,7 @@ void LabStreamEEG::SendData()
 
 	}
 
-	//TODO resample
-
+	//Do not resample before sending, may cause noise to alias in the lower frequencies!
 	outlet->push_chunk(scaledChunk, lsl::local_clock() - compensatedLag);
 }
 

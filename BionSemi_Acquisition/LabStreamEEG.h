@@ -39,6 +39,11 @@ public:
 	* Returns the underlying BioSemi low level API interface.
 	*/
 	BiosemiEEG& GetBiosemiInterface() { return eeg; }
+
+	/*
+	* Stars the LSL outlet stream. 
+	*/
+	void StartStream();
 	/**
 	* Sends data that has been buffered through LSL.
 	*/
@@ -74,8 +79,8 @@ public:
 		offset5Centile = 0.00764,
 		offset95Centile = 0.00783;
 private:
-	lsl::stream_info streamInfo;
 	lsl::stream_outlet *outlet;
+	lsl::stream_info streamInfo;
 	BiosemiEEG eeg;
-	float compensatedLag;
+	float compensatedLag = 0;
 };

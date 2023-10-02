@@ -2,6 +2,7 @@
 #include "LabStreamEEG.h"
 #include <stdio.h>
 #include <string.h>
+
 BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -10,15 +11,55 @@ BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
 }
 
 BioSemi_Acquisition::~BioSemi_Acquisition()
-{}
+{
+    if (dataThread.joinable())
+        dataThread.join();
+}
 
 void BioSemi_Acquisition::onStreamStart() {
-    try {
-        LabStreamEEG lab;
-        lab.SendData();
+    
+
+    if (!dataThread.joinable()) {
+        dataThread = std::thread([&] {
+            if (!isStreaming) {
+                try {
+                    LabStreamEEG lab;
+                    auto& bioInterface = lab.GetBiosemiInterface();
+                    bioInterface.SetLogCallback([&](const std::string &log) {
+                        LogText(log.c_str());
+                    });
+
+                    bioInterface.ConnectAmplifier();
+
+                    isStreaming = true;
+                }
+                catch (const std::exception& e) {
+                    std::string result = std::string(e.what()) + '\n';
+                    LogText(result.c_str());
+                }
+            }
+            else {
+                ui.logText->insertPlainText("NNOOOOO");
+                isStreaming = false;
+            }
+            });
     }
-    catch(const std::exception &e){
-        std::string result = std::string(e.what()) + '\n';
-        ui.logText->insertPlainText(result.c_str());
+    else {
+
+    }
+}
+
+//Invoke the log in a gui thread or not
+void BioSemi_Acquisition::LogText(const char* text, bool guiThread) {
+
+    if (guiThread) {
+        QMetaObject::invokeMethod(this, [=] {
+            ui.logText->insertPlainText(text);
+            ui.logText->insertPlainText("\n");
+        });
+    }
+    else {
+        ui.logText->insertPlainText(text);
+        ui.logText->insertPlainText("\n");
     }
 }
