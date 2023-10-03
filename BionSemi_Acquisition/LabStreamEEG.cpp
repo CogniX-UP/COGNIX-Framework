@@ -1,29 +1,46 @@
 #include "LabStreamEEG.h"
 
 LabStreamEEG::LabStreamEEG(int channelCount)  {
-	//basic data for stream to work
-	streamInfo = lsl::stream_info("BioSemi", "EEG", channelCount, eeg.srate(), lsl::cf_double64, "EEG_BIOSEMI");
-	streamInfo.desc().append_child("amplifier")
-		.append_child("settings")
-		.append_child_value("speedmode", std::to_string(eeg.SpeedMode()));
-	//synchronization meta-data, taken from lsl
-	streamInfo.desc().append_child("synchronization")
-		.append_child_value("offset_mean", std::to_string(LabStreamEEG::offsetMean))
-		.append_child_value("offset_rms", std::to_string(LabStreamEEG::offsetRms))
-		.append_child_value("offset_median", std::to_string(LabStreamEEG::offsetMedian))
-		.append_child_value("offset_5_centile", std::to_string(LabStreamEEG::offset5Centile))
-		.append_child_value("offset_95_centile", std::to_string(LabStreamEEG::offset95Centile));
-	
+	this->channelCount = channelCount;
 }
 LabStreamEEG::~LabStreamEEG()
 {
-	if (outlet)
-		delete outlet;
+
 }
 
 void LabStreamEEG::StartStream() {
-	outlet = new lsl::stream_outlet(streamInfo);
+	try {
+		//Connect the amplifier
+		eeg.ConnectAmplifier();
+
+		//basic data for stream to work
+		streamInfo = lsl::stream_info("BioSemi", "EEG", channelCount, eeg.SampleRate(), lsl::cf_double64, streamName);
+		streamInfo.desc().append_child("amplifier")
+			.append_child("settings")
+			.append_child_value("speedmode", std::to_string(eeg.SpeedMode()));
+		//synchronization meta-data, taken from lsl
+		streamInfo.desc().append_child("synchronization")
+			.append_child_value("offset_mean", std::to_string(LabStreamEEG::offsetMean))
+			.append_child_value("offset_rms", std::to_string(LabStreamEEG::offsetRms))
+			.append_child_value("offset_median", std::to_string(LabStreamEEG::offsetMedian))
+			.append_child_value("offset_5_centile", std::to_string(LabStreamEEG::offset5Centile))
+			.append_child_value("offset_95_centile", std::to_string(LabStreamEEG::offset95Centile));
+
+		outlet.reset(new lsl::stream_outlet(streamInfo));
+	}
+	catch (const std::exception& e) {
+		throw e;
+	}
 }
+
+void LabStreamEEG::StopStream() {
+	auto pointer = outlet.release();
+	if (pointer)
+		delete pointer;
+
+	eeg.DisconnectAmplifier();
+}
+
 void LabStreamEEG::AppendChannelMetadata(const std::vector<std::string>& channels, const std::vector<std::string>& types, const std::unordered_map<std::string, std::vector<std::string>>& locmap)
 {
 	auto chanInfo = streamInfo.desc().append_child("channels");

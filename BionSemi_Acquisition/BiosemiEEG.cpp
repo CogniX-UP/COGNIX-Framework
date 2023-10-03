@@ -53,7 +53,7 @@ const unsigned char msg_handshake[64] = { 255,0 };
 
 BiosemiEEG::BiosemiEEG() {
 	// === load the library & obtain DLL functions ===
-	InvokeLog("Loading BioSemi driver dll...");
+	InvokeLog("Loading BioSemi driver dll...", LogType::Normal);
 	hDLL_ = LOAD_LIBRARY(dllpath);
 	if (!hDLL_)
 		throw std::runtime_error("Could not load BioSemi driver DLL.");
@@ -99,11 +99,12 @@ void BiosemiEEG::ConnectAmplifier() {
 	uint32_t cur_idx;   // index past the current sample
 
 	// === initialize driver ===
-
+	status = Initializing;
 	// connect to driver
 	InvokeLog("Connecting to driver...");
 	hConn_ = OPEN_DRIVER_ASYNC();
 	if (!hConn_) {
+		status = Idle;
 		throw std::runtime_error("Could not open connection to BioSemi driver.");
 	}
 
@@ -111,6 +112,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	InvokeLog("Initializing USB interface...");
 	if (!USB_WRITE(hConn_, &msg_enable[0])) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Could not initialize BioSemi USB2 interface.");
 	}
 
@@ -124,6 +126,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	
 	if (!ringBuffer) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Could not allocate ring buffer (out of memory).");
 	}
 	memset(ringBuffer.get(), 0, buffer_bytes);
@@ -135,6 +138,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	InvokeLog("Enabling handshake...");
 	if (!USB_WRITE(hConn_, &msg_handshake[0])) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Could not enable handshake with BioSemi USB2 interface.");
 	}
 
@@ -146,6 +150,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	if (!READ_POINTER(hConn_, &start_idx)) {
 		USB_WRITE(hConn_, &msg_enable[0]);
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Can not obtain ring buffer pointer from BioSemi driver.");
 	}
 
@@ -153,6 +158,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	if (start_idx > buffer_bytes) {
 		USB_WRITE(hConn_, &msg_enable[0]);
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Buffer pointer returned by BioSemi driver is not in the valid range.");
 	}
 
@@ -164,15 +170,20 @@ void BiosemiEEG::ConnectAmplifier() {
 		if (!READ_POINTER(hConn_, &cur_idx)) {
 			USB_WRITE(hConn_, &msg_enable[0]);
 			CLOSE_DRIVER_ASYNC(hConn_);
+			status = Idle;
 			throw std::runtime_error("Ring buffer handshake with BioSemi driver failed unexpectedly.");
 		}
 		if (((double)(clock() - start_time)) / CLOCKS_PER_SEC > max_waiting_time) {
 			USB_WRITE(hConn_, &msg_enable[0]);
 			CLOSE_DRIVER_ASYNC(hConn_);
-			if (cur_idx - start_idx < 8)
+			if (cur_idx - start_idx < 8) {
+				status = Idle;
 				throw std::runtime_error("BioSemi driver does not transmit data. Is the box turned on?");
-			else
+			}
+			else {
+				status = Idle;
 				throw std::runtime_error("Did not get a sync signal from BioSemi driver. Is the battery charged?");
+			}
 		}
 
 		if ((cur_idx - start_idx >= 8) && (ringBuffer.get()[0] == 0xFFFFFF00)) {
@@ -198,34 +209,38 @@ void BiosemiEEG::ConnectAmplifier() {
 	InvokeLog("MK2: " + is_mk2_);
 
 	// check speed mode
-	speed_mode_ = ((status & (1 << 17)) >> 17) + ((status & (1 << 18)) >> 17) + ((status & (1 << 19)) >> 17) + ((status & (1 << 21)) >> 18);
-	InvokeLog("Speed Mode: " + speed_mode_);
+	speedMode = ((status & (1 << 17)) >> 17) + ((status & (1 << 18)) >> 17) + ((status & (1 << 19)) >> 17) + ((status & (1 << 21)) >> 18);
+	InvokeLog("Speed Mode: " + speedMode);
 
 	// check for problems...
-	if (speed_mode_ > 9) {
+	if (speedMode > 9) {
 		USB_WRITE(hConn_, &msg_enable[0]);
 		CLOSE_DRIVER_ASYNC(hConn_);
-		if (is_mk2_)
+		if (is_mk2_) {
 			throw std::runtime_error("BioSemi amplifier speed mode wheel must be between positions 0 and 8 (9 is a reserved value); recommended for typical use is 4.");
-		else
+			status = Idle;
+		}	
+		else {
 			throw std::runtime_error("BioSemi amplifier speed mode wheel must be between positions 0 and 8 (9 is a reserved value); recommended for typical use is 4.");
+			status = Idle;
+		}
 	}
 
 	// determine sampling rate (http://www.biosemi.com/faq/adjust_samplerate.htm)
-	switch (speed_mode_ & 3) {
-	case 0: srate_ = 2048; break;
-	case 1: srate_ = 4096; break;
-	case 2: srate_ = 8192; break;
-	case 3: srate_ = 16384; break;
+	switch (speedMode & 3) {
+	case 0: sRate = 2048; break;
+	case 1: sRate = 4096; break;
+	case 2: sRate = 8192; break;
+	case 3: sRate = 16384; break;
 	}
 	// speed modes lower than 3 are special on Mk2 and are for daisy-chained setups (@2KHz)
 	bool multibox = false;
-	if (is_mk2_ && speed_mode_ < 4) {
-		srate_ = 2048;
+	if (is_mk2_ && speedMode < 4) {
+		sRate = 2048;
 		multibox = true;
 	}
 
-	InvokeLog("Sampling Rate: " + srate_);
+	InvokeLog("Sampling Rate: " + sRate);
 
 	// determine channel configuration -- this is written according to:
 	//   http://www.biosemi.com/faq/make_own_acquisition_software.htm
@@ -233,42 +248,42 @@ void BiosemiEEG::ConnectAmplifier() {
 	if (is_mk2_) {
 		// in an Mk2 the speed modes 0-3 are for up to 4 daisy-chained boxes; these are 
 		// multiplexed, have 128ch EEG each and 8ch EXG each, plus 16 extra channels each (howdy!)
-		switch (speed_mode_) {
+		switch (speedMode) {
 		case 0:
 		case 1:
 		case 2:
 		case 3:
-			nbeeg_ = 4 * 128; nbexg_ = 4 * 8; nbaux_ = 4 * 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 610; break;
+			eegChanCount = 4 * 128; exgChanCount = 4 * 8; auxChanCount = 4 * 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 610; break;
 			// spd modes 4-7 are the regular ones and have 8 EXG's added in
-		case 4: nbeeg_ = 256; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 282; break;
-		case 5: nbeeg_ = 128; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 154; break;
-		case 6: nbeeg_ = 64; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 90; break;
-		case 7: nbeeg_ = 32; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 58; break;
+		case 4: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 282; break;
+		case 5: eegChanCount = 128; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 154; break;
+		case 6: eegChanCount = 64; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 90; break;
+		case 7: eegChanCount = 32; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 58; break;
 			// spd mode 8 adds
-		case 8: nbeeg_ = 256; nbexg_ = 8; nbaux_ = 16; nbaib_ = 32; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 314; break;
+		case 8: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 314; break;
 		}
 	}
 	else {
 		// in a Mk1 the EXG's are off in spd mode 0-3 and on in spd mode 4-7 (but subtracted from the EEG channels)
-		switch (speed_mode_) {
+		switch (speedMode) {
 			// these are all-EEG modes
-		case 0: nbeeg_ = 256; nbexg_ = 0; nbaux_ = 0; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 258; break;
-		case 1: nbeeg_ = 128; nbexg_ = 0; nbaux_ = 0; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 130; break;
-		case 2: nbeeg_ = 64; nbexg_ = 0; nbaux_ = 0; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 66; break;
-		case 3: nbeeg_ = 32; nbexg_ = 0; nbaux_ = 0; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 34; break;
+		case 0: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
+		case 1: eegChanCount = 128; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
+		case 2: eegChanCount = 64; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
+		case 3: eegChanCount = 32; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
 			// in these modes there are are 8 EXGs and 16 aux channels
-		case 4: nbeeg_ = 232; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 258; break;
-		case 5: nbeeg_ = 104; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 130; break;
-		case 6: nbeeg_ = 40; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 66; break;
-		case 7: nbeeg_ = 8; nbexg_ = 8; nbaux_ = 16; nbaib_ = 0; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 34; break;
+		case 4: eegChanCount = 232; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
+		case 5: eegChanCount = 104; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
+		case 6: eegChanCount = 40; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
+		case 7: eegChanCount = 8; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
 			// in spd mode 8 there are 32 AIB channels from an Analog Input Box (AIB) multiplexed in (EXGs are off)
-		case 8: nbeeg_ = 256; nbexg_ = 0; nbaux_ = 0; nbaib_ = 32; nbtrig_ = 1; nbsync_ = 1; nbchan_ = 290; break;
+		case 8: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 290; break;
 		}
 	}
 
 	if (logCallback) {
 		std::ostringstream oss;
-		oss << "Channels: " << nbchan_ << "(" << nbsync_ << "xSync, " << nbtrig_ << "xTrigger, " << nbeeg_ << "xEEG, " << nbexg_ << "xExG, " << nbaux_ << "xAUX, " << nbaib_ << "xAIB)";
+		oss << "Channels: " << allChanCount << "(" << syncChanCount << "xSync, " << trigChanCount << "xTrigger, " << eegChanCount << "xEEG, " << exgChanCount << "xExG, " << auxChanCount << "xAUX, " << aibChanCount << "xAIB)";
 		InvokeLog(oss.str());
 	}
 
@@ -290,25 +305,28 @@ void BiosemiEEG::ConnectAmplifier() {
 	InvokeLog("Sending the enable message again...");
 	if (!USB_WRITE(hConn_, &msg_enable[0])) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Error while disabling the handshake.");
 	}
 
 	InvokeLog("Closing the driver...");
 	if (!CLOSE_DRIVER_ASYNC(hConn_)) {
+		status = Idle;
 		throw std::runtime_error("Error while disconnecting.");
 	}
 
 	// === reinitialize acquisition ===
 	InvokeLog("Allocating a new ring buffer...");
-	ringBuffer.reset(new uint32_t[buffer_samples * nbchan_]);
+	ringBuffer.reset(new uint32_t[buffer_samples * allChanCount]);
 
 	if (!ringBuffer) {
+		status = Idle;
 		throw std::runtime_error("Could not reallocate ring buffer (out of memory?).");
 	}
 
 	InvokeLog("Zeroing the ring buffer...");
 
-	memset(ringBuffer.get(), 0, buffer_samples * 4 * nbchan_);
+	memset(ringBuffer.get(), 0, buffer_samples * 4 * allChanCount);
 
 	// reconnect to driver
 
@@ -316,6 +334,7 @@ void BiosemiEEG::ConnectAmplifier() {
 
 	hConn_ = OPEN_DRIVER_ASYNC();
 	if (!hConn_) {
+		status = Idle;
 		throw std::runtime_error("Could not open connection to BioSemi driver.");
 	}
 	// reinitialize USB2 interface
@@ -323,18 +342,20 @@ void BiosemiEEG::ConnectAmplifier() {
 	InvokeLog("Reinitializing the USB interface...");
 	if (!USB_WRITE(hConn_, &msg_enable[0])) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Could not initialize BioSemi USB2 interface.");
 	}
 	// begin acquisition
 
 	InvokeLog("Starting data acquisition...");
 
-	READ_MULTIPLE_SWEEPS(hConn_, (char*)ringBuffer.get(), buffer_samples * 4 * nbchan_);
+	READ_MULTIPLE_SWEEPS(hConn_, (char*)ringBuffer.get(), buffer_samples * 4 * allChanCount);
 	// enable handshake
 	InvokeLog("Enabling handshake...");
 
 	if (!USB_WRITE(hConn_, &msg_handshake[0])) {
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Could not reenable handshake with BioSemi USB2 interface.");
 	}
 
@@ -347,6 +368,7 @@ void BiosemiEEG::ConnectAmplifier() {
 	if (!READ_POINTER(hConn_, &start_idx)) {
 		USB_WRITE(hConn_, &msg_enable[0]);
 		CLOSE_DRIVER_ASYNC(hConn_);
+		status = Idle;
 		throw std::runtime_error("Can not obtain ring buffer pointer from BioSemi driver.");
 	}
 
@@ -358,28 +380,34 @@ void BiosemiEEG::ConnectAmplifier() {
 		if (!READ_POINTER(hConn_, &cur_idx)) {
 			USB_WRITE(hConn_, &msg_enable[0]);
 			CLOSE_DRIVER_ASYNC(hConn_);
+			status = Idle;
 			throw std::runtime_error("Ring buffer handshake with BioSemi driver failed unexpectedly.");
 		}
 		if (((double)(clock() - start_time)) / CLOCKS_PER_SEC > max_waiting_time) {
 			USB_WRITE(hConn_, &msg_enable[0]);
 			CLOSE_DRIVER_ASYNC(hConn_);
-			if (cur_idx - start_idx < 8)
+			if (cur_idx - start_idx < 8) {
+				status = Idle;
 				throw std::runtime_error("BioSemi driver does not transmit data. Is the box turned on?");
-			else
-				throw std::runtime_error("Did not get a sync signal from BioSemi driver. Is the battery charged?");
+			}
+			else 
+			{
+				status = Idle;
+				throw std::runtime_error("Did not get a sync signal from BioSemi driver. Is the battery charged?");	
+			}
 		}
-		if ((cur_idx - start_idx >= 4 * nbchan_) && (ringBuffer.get()[0] == 0xFFFFFF00))
+		if ((cur_idx - start_idx >= 4 * allChanCount) && (ringBuffer.get()[0] == 0xFFFFFF00))
 			// got a sync signal on the first index
 			start_idx = 0;
-		if ((cur_idx - start_idx >= 4 * nbchan_) && (ringBuffer.get()[start_idx / 4] == 0xFFFFFF00)) {
-			if (ringBuffer.get()[start_idx / 4 + nbchan_] != 0xFFFFFF00) {
+		if ((cur_idx - start_idx >= 4 * allChanCount) && (ringBuffer.get()[start_idx / 4] == 0xFFFFFF00)) {
+			if (ringBuffer.get()[start_idx / 4 + allChanCount] != 0xFFFFFF00) {
 				USB_WRITE(hConn_, &msg_enable[0]);
 				CLOSE_DRIVER_ASYNC(hConn_);
+				status = Idle;
 				throw std::runtime_error("Sync signal did not show up at the expected position.");
 			}
 			else {
 				InvokeLog("Channel format is correct...");
-
 				// all correct
 				break;
 			}
@@ -391,11 +419,11 @@ void BiosemiEEG::ConnectAmplifier() {
 
 	channelLabels.clear();
 	channelTypes.clear();
-	for (int k = 1; k <= nbsync_; k++) {
+	for (int k = 1; k <= syncChanCount; k++) {
 		channelLabels.push_back(std::string("Sync") += std::to_string(k));
 		channelTypes.push_back("Sync");
 	}
-	for (int k = 1; k <= nbtrig_; k++) {
+	for (int k = 1; k <= trigChanCount; k++) {
 		channelLabels.push_back(std::string("Trig") += std::to_string(k));
 		channelTypes.push_back("Trigger");
 	}
@@ -403,20 +431,20 @@ void BiosemiEEG::ConnectAmplifier() {
 		// multi-box setup
 		for (int b = 0; b <= 3; b++) {
 			const char* boxid[] = { "_Box1","_Box2","_Box3","_Box4" };
-			for (int k = 1; k <= nbeeg_ / 4; k++) {
+			for (int k = 1; k <= eegChanCount / 4; k++) {
 				std::string tmp = "A"; tmp[0] = 'A' + (k - 1) / 32;
 				channelLabels.push_back((std::string(tmp) += std::to_string(1 + (k - 1) % 32)) += boxid[b]);
 				channelTypes.push_back("EEG");
 			}
-			for (int k = 1; k <= nbexg_ / 4; k++) {
+			for (int k = 1; k <= exgChanCount / 4; k++) {
 				channelLabels.push_back((std::string("EX") += std::to_string(k)) += boxid[b]);
 				channelTypes.push_back("EXG");
 			}
-			for (int k = 1; k <= nbaux_ / 4; k++) {
+			for (int k = 1; k <= auxChanCount / 4; k++) {
 				channelLabels.push_back((std::string("AUX") += std::to_string(k)) += boxid[b]);
 				channelTypes.push_back("AUX");
 			}
-			for (int k = 1; k <= nbaib_ / 4; k++) {
+			for (int k = 1; k <= aibChanCount / 4; k++) {
 				channelLabels.push_back((std::string("AIB") += std::to_string(k)) += boxid[b]);
 				channelTypes.push_back("Analog");
 			}
@@ -424,26 +452,35 @@ void BiosemiEEG::ConnectAmplifier() {
 	}
 	else {
 		// regular setup
-		for (int k = 1; k <= nbeeg_; k++) {
+		for (int k = 1; k <= eegChanCount; k++) {
 			std::string tmp = "A"; tmp[0] = 'A' + (k - 1) / 32;
 			channelLabels.push_back(std::string(tmp) += std::to_string(1 + (k - 1) % 32));
 			channelTypes.push_back("EEG");
 		}
-		for (int k = 1; k <= nbexg_; k++) {
+		for (int k = 1; k <= exgChanCount; k++) {
 			channelLabels.push_back(std::string("EX") += std::to_string(k));
 			channelTypes.push_back("EXG");
 		}
-		for (int k = 1; k <= nbaux_; k++) {
+		for (int k = 1; k <= auxChanCount; k++) {
 			channelLabels.push_back(std::string("AUX") += std::to_string(k));
 			channelTypes.push_back("AUX");
 		}
-		for (int k = 1; k <= nbaib_; k++) {
+		for (int k = 1; k <= aibChanCount; k++) {
 			channelLabels.push_back(std::string("AIB") += std::to_string(k));
 			channelTypes.push_back("Analog");
 		}
 	}
 
 	last_idx_ = 0;
+
+	status = Acquiring;
+}
+
+void BiosemiEEG::DisconnectAmplifier() {
+	status = Idle;
+	auto pointer = ringBuffer.release();
+	if (pointer)
+		delete pointer;
 }
 
 void BiosemiEEG::GetChunk(Chunk& result) {
@@ -454,34 +491,34 @@ void BiosemiEEG::GetChunk(Chunk& result) {
 	cur_idx = cur_idx / 4;
 
 	// forget about incomplete sample data
-	cur_idx = cur_idx - cur_idx % nbchan_;
+	cur_idx = cur_idx - cur_idx % allChanCount;
 	if (cur_idx < 0)
-		cur_idx = cur_idx + buffer_samples * nbchan_;
+		cur_idx = cur_idx + buffer_samples * allChanCount;
 
 	result.clear();
 	if (cur_idx != last_idx_) {
 		if (cur_idx > last_idx_) {
 			// sequential read: copy intermediate part between offsets
-			int chunklen = (cur_idx - last_idx_) / nbchan_;
+			int chunklen = (cur_idx - last_idx_) / allChanCount;
 			result.resize(chunklen);
 			for (int k = 0; k < chunklen; k++) {
-				result[k].resize(nbchan_);
-				memcpy(&result[k][0], &ringBuffer.get()[last_idx_ + k * nbchan_], nbchan_ * 4);
+				result[k].resize(allChanCount);
+				memcpy(&result[k][0], &ringBuffer.get()[last_idx_ + k * allChanCount], allChanCount * 4);
 			}
 		}
 		else {
 			// wrap-around read: concatenate two parts
-			int chunklen = (cur_idx + buffer_samples * nbchan_ - last_idx_) / nbchan_;
+			int chunklen = (cur_idx + buffer_samples * allChanCount - last_idx_) / allChanCount;
 			result.resize(chunklen);
-			int first_section = buffer_samples - last_idx_ / nbchan_;
+			int first_section = buffer_samples - last_idx_ / allChanCount;
 			for (int k = 0; k < first_section; k++) {
-				result[k].resize(nbchan_);
-				memcpy(&result[k][0], &ringBuffer.get()[last_idx_ + k * nbchan_], nbchan_ * 4);
+				result[k].resize(allChanCount);
+				memcpy(&result[k][0], &ringBuffer.get()[last_idx_ + k * allChanCount], allChanCount * 4);
 			}
 			int second_section = chunklen - first_section;
 			for (int k = 0; k < second_section; k++) {
-				result[first_section + k].resize(nbchan_);
-				memcpy(&result[first_section + k][0], &ringBuffer.get()[k * nbchan_], nbchan_ * 4);
+				result[first_section + k].resize(allChanCount);
+				memcpy(&result[first_section + k][0], &ringBuffer.get()[k * allChanCount], allChanCount * 4);
 			}
 		}
 		// update status flags
@@ -493,11 +530,16 @@ void BiosemiEEG::GetChunk(Chunk& result) {
 	last_idx_ = cur_idx;
 }
 
-void BiosemiEEG::SetLogCallback(std::function<void(const std::string&)> callback) {
+void BiosemiEEG::SetLogCallback(std::function<void(const std::string&, LogType logType)> callback) {
 	logCallback = callback;
 }
 
-void BiosemiEEG::InvokeLog(const std::string &txt) {
+void BiosemiEEG::InvokeLog(const std::string &txt, LogType logType) {
 	if (logCallback)
-		logCallback(txt);
+		logCallback(txt, logType);
+}
+
+void BiosemiEEG::InvokeLogError(const std::string& txt) {
+	if (logCallback)
+		logCallback(txt, LogType::Error);
 }

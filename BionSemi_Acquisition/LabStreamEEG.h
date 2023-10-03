@@ -8,8 +8,9 @@
 #pragma once
 #include <lsl_cpp.h>
 #include "BiosemiEEG.h"
-#include<unordered_map>
-
+#include <unordered_map>
+#include <memory>
+#include <string>
 /**
 * The class LabStreamEEG for acquiring raw data from the BioSemi ActiveTwo, 
 * rescaling and resampling if necessary and applying speficic EEG metadata.
@@ -39,11 +40,14 @@ public:
 	* Returns the underlying BioSemi low level API interface.
 	*/
 	BiosemiEEG& GetBiosemiInterface() { return eeg; }
-
 	/*
 	* Stars the LSL outlet stream. 
 	*/
 	void StartStream();
+	/*
+	* Stops the LSL outlet stream.
+	*/
+	void StopStream();
 	/**
 	* Sends data that has been buffered through LSL.
 	*/
@@ -78,9 +82,13 @@ public:
 		offsetMedian = 0.00772,
 		offset5Centile = 0.00764,
 		offset95Centile = 0.00783;
+
+public:
+	std::string streamName;
 private:
-	lsl::stream_outlet *outlet;
+	std::unique_ptr<lsl::stream_outlet> outlet;
 	lsl::stream_info streamInfo;
 	BiosemiEEG eeg;
 	float compensatedLag = 0;
+	int channelCount = 0;
 };

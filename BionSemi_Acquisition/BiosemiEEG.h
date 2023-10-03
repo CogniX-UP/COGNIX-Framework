@@ -14,6 +14,8 @@
 
 class BiosemiEEG {
 public:
+	enum Status {Idle, Initializing, Acquiring };
+	enum LogType {Normal, Error, Warning };
 	// raw sample from the BioSemi amp
 	typedef std::vector<int32_t> Sample_T;
 	// chunk of raw samples
@@ -25,28 +27,29 @@ public:
 	~BiosemiEEG();
 
 	void ConnectAmplifier();
+	void DisconnectAmplifier();
 	// get a chunk of raw data
 	void GetChunk(Chunk& result);
 
 	// get channel names
-	const std::vector<std::string>& channel_labels() const { return channelLabels; }
+	const std::vector<std::string>& ChannelLabels() const { return channelLabels; }
 	// get channel types (Sync, Trigger, EEG, EXG,
-	const std::vector<std::string>& channel_types() const { return channelTypes; }
+	const std::vector<std::string>& ChannelTypes() const { return channelTypes; }
 
 	// query amplifier parameters
 	bool IsMk2() const { return is_mk2_; }
 	bool HasLowBattery() const { return battery_low_; }
-	int SpeedMode() const { return speed_mode_; }
-	int srate() const { return srate_; }
-	int AllChannelCount() const { return nbchan_; }
-	int SyncChannelCount() const { return nbsync_; }
-	int TriggerChannelCount() const { return nbtrig_; }
-	int EegChannelCount() const { return nbeeg_; }
-	int ExgChannelCount() const { return nbexg_; }
-	int AuxChannelCount() const { return nbaux_; }
-	int AibChannelCount() const { return nbaib_; }
-	void SetLogCallback(std::function<void(const std::string&)>);
-
+	int SpeedMode() const { return speedMode; }
+	int SampleRate() const { return sRate; }
+	int AllChannelCount() const { return allChanCount; }
+	int SyncChannelCount() const { return syncChanCount; }
+	int TriggerChannelCount() const { return trigChanCount; }
+	int EegChannelCount() const { return eegChanCount; }
+	int ExgChannelCount() const { return exgChanCount; }
+	int AuxChannelCount() const { return auxChanCount; }
+	int AibChannelCount() const { return aibChanCount; }
+	void SetLogCallback(std::function<void(const std::string&, LogType logType)>);
+	Status GetStatus() { return status; }
 private:
 	// function handle types for the library IO
 	typedef void* (BIOSEMI_LINKAGE* OPEN_DRIVER_ASYNC_t)(void);
@@ -56,19 +59,24 @@ private:
 	typedef int (BIOSEMI_LINKAGE* CLOSE_DRIVER_ASYNC_t)(void*);
 
 	//log callback
-	std::function<void(std::string)> logCallback = nullptr;
-	void InvokeLog(const std::string &txt);
+	std::function<void(std::string, LogType logType)> logCallback = nullptr;
+
+	Status status = Status::Idle;
+
+	//These could be templated
+	void InvokeLog(const std::string &txt, LogType logType = LogType::Normal);
+	void InvokeLogError(const std::string &txt);
 	// amplifier parameters
 	bool is_mk2_;       // whether the amp is a MK2 amplifier
-	int speed_mode_;    // amplifier speed mode
-	int srate_;         // native sampling rate
-	int nbsync_;        // number of synchronization channels
-	int nbtrig_;        // number of trigger channels
-	int nbeeg_;         // number of EEG channels
-	int nbexg_;         // number of ExG channels
-	int nbaux_;			// number of AUX channels
-	int nbaib_;			// number of AIB channels
-	int nbchan_;        // total number of channels
+	int speedMode;    // amplifier speed mode
+	int sRate;         // native sampling rate
+	int syncChanCount;        // number of synchronization channels
+	int trigChanCount;        // number of trigger channels
+	int eegChanCount;         // number of EEG channels
+	int exgChanCount;         // number of ExG channels
+	int auxChanCount;			// number of AUX channels
+	int aibChanCount;			// number of AIB channels
+	int allChanCount;        // total number of channels
 	bool battery_low_;  // whether the battery is low
 
 	// ring buffer pointer (from the driver)
@@ -78,8 +86,6 @@ private:
 	// vector of channel types (in LSL Semi naming scheme)
 	std::vector<std::string> channelTypes;
 
-	
-	
 	int last_idx_;
 	// DLL handle
 	void* hDLL_;

@@ -333,7 +333,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Start Stream</string>
+     <string>Start</string>
     </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">
