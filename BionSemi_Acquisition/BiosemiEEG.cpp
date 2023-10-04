@@ -50,6 +50,7 @@ const unsigned char msg_handshake[64] = { 255,0 };
 #define FREE_LIBRARY(lhandle) dlclose(lhandle)
 #endif
 
+#define tos(x) std::to_string(x)
 
 BiosemiEEG::BiosemiEEG() {
 	// === load the library & obtain DLL functions ===
@@ -201,16 +202,16 @@ void BiosemiEEG::ConnectAmplifier() {
 
 	// read the trigger channel data ...
 	InvokeLog("Checking status...");
-	uint32_t status = ringBuffer.get()[start_idx / 4 + 1] >> 8;
-	InvokeLog("Status: " + status);
+	uint32_t deviceStatus = ringBuffer.get()[start_idx / 4 + 1] >> 8;
+	InvokeLog("Status: " + tos(deviceStatus));
 
 	// determine channel configuration
-	is_mk2_ = ((status & (1 << 23)) != 0);
-	InvokeLog("MK2: " + is_mk2_);
+	is_mk2_ = ((deviceStatus & (1 << 23)) != 0);
+	InvokeLog("MK2: " + tos(is_mk2_));
 
 	// check speed mode
-	speedMode = ((status & (1 << 17)) >> 17) + ((status & (1 << 18)) >> 17) + ((status & (1 << 19)) >> 17) + ((status & (1 << 21)) >> 18);
-	InvokeLog("Speed Mode: " + speedMode);
+	speedMode = ((deviceStatus & (1 << 17)) >> 17) + ((deviceStatus & (1 << 18)) >> 17) + ((deviceStatus & (1 << 19)) >> 17) + ((deviceStatus & (1 << 21)) >> 18);
+	InvokeLog("Speed Mode: " + tos(speedMode));
 
 	// check for problems...
 	if (speedMode > 9) {
@@ -240,7 +241,7 @@ void BiosemiEEG::ConnectAmplifier() {
 		multibox = true;
 	}
 
-	InvokeLog("Sampling Rate: " + sRate);
+	InvokeLog("Sampling Rate: " + tos(sRate));
 
 	// determine channel configuration -- this is written according to:
 	//   http://www.biosemi.com/faq/make_own_acquisition_software.htm
@@ -288,13 +289,13 @@ void BiosemiEEG::ConnectAmplifier() {
 	}
 
 	// check for additional problematic conditions
-	battery_low_ = (status & (1 << 22)) != 0;
+	battery_low_ = (deviceStatus & (1 << 22)) != 0;
 	if (battery_low_) {
 		InvokeLog("Battery: Low");
 		InvokeLog("Amplifier will shut down within 30-60 minutes");
 	}
 	else
-		InvokeLog("Battery: Low");
+		InvokeLog("Battery: OK!");
 
 	// compute a proper buffer size (needs to be a multiple of 512, a multiple of nbchan, as well as ~32MB in size)
 	InvokeLog("Reallocating optimized ring buffer...");
@@ -421,59 +422,74 @@ void BiosemiEEG::ConnectAmplifier() {
 	channelTypes.clear();
 	for (int k = 1; k <= syncChanCount; k++) {
 		channelLabels.push_back(std::string("Sync") += std::to_string(k));
-		channelTypes.push_back("Sync");
+		channelTypes.push_back(syncType);
 	}
 	for (int k = 1; k <= trigChanCount; k++) {
 		channelLabels.push_back(std::string("Trig") += std::to_string(k));
-		channelTypes.push_back("Trigger");
+		channelTypes.push_back(triggerType);
 	}
+
+	//Won't look at this for now - it's for speed less than 4
 	if (multibox) {
 		// multi-box setup
 		for (int b = 0; b <= 3; b++) {
 			const char* boxid[] = { "_Box1","_Box2","_Box3","_Box4" };
+			
 			for (int k = 1; k <= eegChanCount / 4; k++) {
-				std::string tmp = "A"; tmp[0] = 'A' + (k - 1) / 32;
+				std::string tmp = "A"; 
+				
+				tmp[0] = 'A' + (k - 1) / 32;
+				
 				channelLabels.push_back((std::string(tmp) += std::to_string(1 + (k - 1) % 32)) += boxid[b]);
-				channelTypes.push_back("EEG");
+				channelTypes.push_back(eegType);
 			}
+
 			for (int k = 1; k <= exgChanCount / 4; k++) {
 				channelLabels.push_back((std::string("EX") += std::to_string(k)) += boxid[b]);
-				channelTypes.push_back("EXG");
+				channelTypes.push_back(exgType);
 			}
+
 			for (int k = 1; k <= auxChanCount / 4; k++) {
 				channelLabels.push_back((std::string("AUX") += std::to_string(k)) += boxid[b]);
-				channelTypes.push_back("AUX");
+				channelTypes.push_back(auxType);
 			}
+
 			for (int k = 1; k <= aibChanCount / 4; k++) {
 				channelLabels.push_back((std::string("AIB") += std::to_string(k)) += boxid[b]);
-				channelTypes.push_back("Analog");
+				channelTypes.push_back(aibType);
 			}
 		}
 	}
 	else {
 		// regular setup
 		for (int k = 1; k <= eegChanCount; k++) {
-			std::string tmp = "A"; tmp[0] = 'A' + (k - 1) / 32;
+			//BioSemi might have A-H, hence we use index k to create the A1-H32
+			std::string tmp = "A"; 
+			tmp[0] = 'A' + (k - 1) / 32;
 			channelLabels.push_back(std::string(tmp) += std::to_string(1 + (k - 1) % 32));
-			channelTypes.push_back("EEG");
+			channelTypes.push_back(eegType);
 		}
+
 		for (int k = 1; k <= exgChanCount; k++) {
 			channelLabels.push_back(std::string("EX") += std::to_string(k));
-			channelTypes.push_back("EXG");
+			channelTypes.push_back(exgType);
 		}
+
 		for (int k = 1; k <= auxChanCount; k++) {
 			channelLabels.push_back(std::string("AUX") += std::to_string(k));
-			channelTypes.push_back("AUX");
+			channelTypes.push_back(auxType);
 		}
+
 		for (int k = 1; k <= aibChanCount; k++) {
 			channelLabels.push_back(std::string("AIB") += std::to_string(k));
-			channelTypes.push_back("Analog");
+			channelTypes.push_back(aibType);
 		}
 	}
 
 	last_idx_ = 0;
 
 	status = Acquiring;
+	InvokeLog("Acquiring!!");
 }
 
 void BiosemiEEG::DisconnectAmplifier() {
@@ -522,8 +538,8 @@ void BiosemiEEG::GetChunk(Chunk& result) {
 			}
 		}
 		// update status flags
-		uint32_t status = ringBuffer.get()[cur_idx] >> 8;
-		battery_low_ = (status & (1 << 22)) != 0;
+		uint32_t deviceStatus = ringBuffer.get()[cur_idx] >> 8;
+		battery_low_ = (deviceStatus & (1 << 22)) != 0;
 	}
 
 	// update last buffer pointer

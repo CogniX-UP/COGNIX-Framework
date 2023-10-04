@@ -1,0 +1,55 @@
+{
+    "general": {
+        "stream_name": "biosemi",
+        "interval": 500,
+        "compensated_lag": 0,
+        "causal_correction": 0
+    },
+    "eeg": {
+        "exg": {
+            "EX1": false,
+            "EX2": false,
+            "EX3": false,
+            "EX4": false,
+            "EX5": false,
+            "EX6": false,
+            "EX7": false,
+            "EX8": false
+        },
+        "channels": {
+            "count": 32,
+            "A1": "fp1",
+            "A10": "cp5",
+            "A11": "p7",
+            "A12": "p3",
+            "A13": "pz",
+            "A14": "po3",
+            "A15": "o1",
+            "A16": "oz",
+            "A17": "o2",
+            "A18": "po4",
+            "A19": "p4",
+            "A2": "af3",
+            "A20": "p8",
+            "A21": "cp6",
+            "A22": "cp2",
+            "A23": "c4",
+            "A24": "t8",
+            "A25": "fc6",
+            "A26": "fc2",
+            "A27": "f4",
+            "A28": "f8",
+            "A29": "af4",
+            "A3": "f7",
+            "A30": "fp2",
+            "A31": "fz",
+            "A32": "cz",
+            "A4": "f3",
+            "A5": "fc1",
+            "A6": "fc5",
+            "A7": "t7",
+            "A8": "c3",
+            "A9": "cp1"
+        }
+    }
+}

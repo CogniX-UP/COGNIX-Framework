@@ -11,9 +11,28 @@
 #define BIOSEMI_LINKAGE
 #endif
 
-
+//We assume that the order is synch -> triggers -> eeg -> exg -> aux -> analog for a regular set up
+//We won't be discussing daisy-channels for now, though code has been written for them 
 class BiosemiEEG {
 public:
+	inline static const std::string
+		syncType = "Sync",
+		triggerType = "Trigger",
+		eegType = "EEG",
+		exgType = "EXG",
+		auxType = "AUX",
+		aibType = "Analog";
+
+	inline static const std::string
+		ex1 = "EX1",
+		ex2 = "EX2",
+		ex3 = "EX3",
+		ex4 = "EX4",
+		ex5 = "EX5",
+		ex6 = "EX6",
+		ex7 = "EX7",
+		ex8 = "EX8";
+
 	enum Status {Idle, Initializing, Acquiring };
 	enum LogType {Normal, Error, Warning };
 	// raw sample from the BioSemi amp

@@ -11,6 +11,10 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <vector>
+#include <rapidjson/document.h>
+#include <unordered_map>
+#include "BiosemiStreamSetting.h"
 /**
 * The class LabStreamEEG for acquiring raw data from the BioSemi ActiveTwo, 
 * rescaling and resampling if necessary and applying speficic EEG metadata.
@@ -24,14 +28,13 @@ class LabStreamEEG {
 public:
 	~LabStreamEEG();
 	/**
-	* Constructs the LSL stream, passing the total number of channels to the constructor.
+	* Constructs the LSL streamer.
 	*/
-	LabStreamEEG() :LabStreamEEG(eeg.AllChannelCount()) {};
+	LabStreamEEG() { }
 	/**
 	* Constructs the LSL stream, passing a specified number of channels to the consturctor.
 	* @param channelCount Constructor argument for specifying the number of channels to be used.
 	*/
-	LabStreamEEG(int channelCount);
 	/**
 	* Returns the stream info, a collection of metadata describing the BioSemi ActiveTwo acquisition.
 	*/
@@ -40,6 +43,18 @@ public:
 	* Returns the underlying BioSemi low level API interface.
 	*/
 	BiosemiEEG& GetBiosemiInterface() { return eeg; }
+	/**
+	* Gets the Stream Setting parameters
+	*/
+	BiosemiStreamSetting& GetStreamSetting() { return streamSetting; }
+	/*
+	* Ensures there's a connection [physical / wireless] to the device and is ready for acquiring
+	*/
+	void ConnectDevice();
+	/*
+	* Disconnects the device
+	*/
+	void DisconnectDevice();
 	/*
 	* Stars the LSL outlet stream. 
 	*/
@@ -48,33 +63,16 @@ public:
 	* Stops the LSL outlet stream.
 	*/
 	void StopStream();
+	/*
+	* Read from a configuration file
+	*/
+	void Load(const std::string &config, bool isFile);
+	void Save(const std::string &location);
 	/**
 	* Sends data that has been buffered through LSL.
 	*/
-	void SendData();
-	/**
-	* Append channel metadata and locations. See EEG metadata template.
-	* 
-	* @param channels The name of the channels given as alphanumeric values.
-	* @param types The type of the channel. A significant portion is EEG, but some of the types include AUX
-	* for auxiliary.
-	* @param locmap A hashmap giving the locations of each channel. If not given, an empty map should be passed.
-	*/
-	void AppendChannelMetadata(const std::vector<std::string> &channels, const std::vector<std::string> &types, const std::unordered_map<std::string, std::vector<std::string>> &locmap);
-	/**
-	* Append reference metadata to the stream.
-	* 
-	* @param refNames The reference names. In our case, the EXT channels are used.
-	*/
-	void AppendRefMetadata(const std::vector<std::string> &refNames);
-	/**
-	* Append acquisition metadata.
-	* 
-	* @param compensatedLag The lag that may occur due to signal processing
-	* @param causalCorrection A time correction for synchronization purposes
-	*/
-	void AppendAcquisitionMetadata(float compensatedLag, float causalCorrection);
-
+	void SendData(BiosemiEEG::Chunk& chunk);
+	
 	//Synchronization meta-data
 	const float 
 		offsetMean = 0.00772,
@@ -83,12 +81,25 @@ public:
 		offset5Centile = 0.00764,
 		offset95Centile = 0.00783;
 
+	inline static const std::string
+		eegKey = "eeg",
+		eegChannelCount = "count",
+		exgKey = "exg";
+
 public:
-	std::string streamName;
+	inline static const std::string
+		gKey = "general",
+		compLag = "compensated_lag",
+		causalCorr = "causal_correction";
 private:
+
 	std::unique_ptr<lsl::stream_outlet> outlet;
 	lsl::stream_info streamInfo;
 	BiosemiEEG eeg;
-	float compensatedLag = 0;
-	int channelCount = 0;
+	BiosemiStreamSetting streamSetting;
+
+	//Current set up for acquiring
+	std::vector<std::string> activeChannels;
+	std::vector<std::string> activeChannelTypes;
+	std::vector<uint32_t> activeChannelIndexes;
 };

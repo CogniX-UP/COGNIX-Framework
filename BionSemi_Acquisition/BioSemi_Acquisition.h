@@ -14,17 +14,21 @@ public:
     BioSemi_Acquisition(QWidget *parent = nullptr);
     ~BioSemi_Acquisition();
     Ui::BioSemi_AcquisitionClass& GetUI() { return ui; }
-    void LogText(const char* txt, bool guiThread = true);
+    void LogText(const char* txt, bool asError = false, bool guiThread = true);
 
 private:
+    inline static std::string saveLocation = "settings.json";
     Ui::BioSemi_AcquisitionClass ui;
     bool isStreaming = false;
     std::unique_ptr<LabStreamEEG> labStream;
     std::unique_ptr<std::thread> dataThread;
     std::vector<QWidget*> interactables;
+    std::vector<QCheckBox*> exgCheckboxes;
 private:
     void EnableInteraction(bool enable);
     void KillDataThread(bool join);
+    void LoadToUI();
+    void SaveFromUI();
 private slots:
     void onStreamStart();
 
