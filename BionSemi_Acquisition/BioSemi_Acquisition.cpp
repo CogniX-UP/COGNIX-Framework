@@ -74,14 +74,12 @@ void BioSemi_Acquisition::onStreamStart() {
                     ui.startStreamButton->setText("Stop");
                     ui.startStreamButton->setEnabled(true);
                 });
-
                 isStreaming = true;
                 auto& streamSetting = labStream->GetStreamSetting();
                 //Send the data here
                 while (isStreaming) {
                     auto time = std::chrono::milliseconds(streamSetting.interval);
                     std::this_thread::sleep_for(time);
-                    LogText("XD", false, true);
                     BiosemiEEG::Chunk chunk;
                     labStream->SendData(chunk);
 

@@ -1,7 +1,7 @@
 {
     "general": {
         "stream_name": "biosemi",
-        "interval": 500,
+        "interval": 1000,
         "compensated_lag": 0,
         "causal_correction": 0
     },
