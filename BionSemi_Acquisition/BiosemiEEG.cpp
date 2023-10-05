@@ -86,11 +86,7 @@ BiosemiEEG::BiosemiEEG() {
 }
 
 BiosemiEEG::~BiosemiEEG() {
-	/* close driver connection */
-	if (!USB_WRITE(hConn_, &msg_enable[0]))
-		InvokeLog("The handshake while shutting down the BioSemi driver gave an error.");
-	if (!CLOSE_DRIVER_ASYNC(hConn_))
-		InvokeLog("Closing the BioSemi driver gave an error.");
+	DisconnectAmplifier();
 	// close the DLL
 	FREE_LIBRARY(hDLL_);
 }
@@ -497,6 +493,12 @@ void BiosemiEEG::DisconnectAmplifier() {
 	auto pointer = ringBuffer.release();
 	if (pointer)
 		delete pointer;
+
+	/* close driver connection */
+	if (!USB_WRITE(hConn_, &msg_enable[0]))
+		InvokeLog("The handshake while shutting down the BioSemi driver gave an error.");
+	if (!CLOSE_DRIVER_ASYNC(hConn_))
+		InvokeLog("Closing the BioSemi driver gave an error.");
 }
 
 void BiosemiEEG::GetChunk(Chunk& result) {

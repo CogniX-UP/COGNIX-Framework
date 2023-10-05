@@ -4,12 +4,14 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
-
+#include <qtextcursor.h>
 BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
     connect(ui.startStreamButton, SIGNAL(clicked()), SLOT(onStreamStart()));
+    connect(ui.clearButton, SIGNAL(clicked()), SLOT(clearLogText()));
+
     labStream = std::make_unique<LabStreamEEG>();
 
     interactables.push_back(ui.ex1);
@@ -56,7 +58,9 @@ void BioSemi_Acquisition::closeEvent(QCloseEvent* event)  {
     labStream->StopStream();
     labStream->DisconnectDevice();
 }
-
+void BioSemi_Acquisition::clearLogText() {
+    ui.logText->clear();
+}
 void BioSemi_Acquisition::onStreamStart() {
 
     auto enableLambda = [this] { EnableInteraction(true); };
@@ -69,6 +73,7 @@ void BioSemi_Acquisition::onStreamStart() {
             LogText(e.what(), true, false);
         }
         //Create the thread here
+        ui.logText->clear();
         EnableInteraction(false);
         auto thread = new std::thread([&] {
             try {
@@ -87,16 +92,31 @@ void BioSemi_Acquisition::onStreamStart() {
                 //Send the data here
                 BiosemiEEG::Chunk rawChunk, outChunk;
 
-                while (isStreaming) {
-                    auto time = std::chrono::milliseconds(streamSetting.interval);
-                    std::this_thread::sleep_for(time);
+                LogText(separator, false, true);
+
+;               while (isStreaming) {
+                    auto interval = std::chrono::milliseconds(streamSetting.interval);
+                    std::this_thread::sleep_for(interval);
                     labStream->SendData(rawChunk, outChunk);
 
+                    std::ostringstream s;
+                    auto timeT = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                    auto time = std::ctime(&timeT);
+                    std::string sTime(time);
+                    sTime.erase(sTime.length() - 1);
+                    s <<"[" << sTime << "]" << " Send " << rawChunk.size() << " samples";
+                    
+                    QString result(s.str().c_str());
+                    QMetaObject::invokeMethod(this, [this, result] {
+                        auto txtArea = ui.dataText;
+                        txtArea->setText(result);
+                    }, Qt::QueuedConnection);
                 }
 
                 labStream->StopStream();
                 labStream->DisconnectDevice();
 
+                LogText("Stopped acquiring", false, true);
                 QMetaObject::invokeMethod(this, enableLambda, Qt::QueuedConnection);
             }
             catch (const std::exception &e) {

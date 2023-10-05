@@ -19,6 +19,7 @@ public:
     void LogText(const char* txt, bool asError = false, bool guiThread = true);
 
 private:
+    const char* separator = "----------------------------";
     inline static std::string saveLocation = "settings.json";
     Ui::BioSemi_AcquisitionClass ui;
     bool isStreaming = false;
@@ -33,6 +34,7 @@ private:
     void SaveFromUI();
 private slots:
     void onStreamStart();
+    void clearLogText();
 protected:
     void closeEvent(QCloseEvent* event) override;
 

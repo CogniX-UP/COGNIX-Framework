@@ -203,8 +203,8 @@ void LabStreamEEG::SendData(BiosemiEEG::Chunk &rawChunk, BiosemiEEG::Chunk &outC
 		auto& label = activeChannels[index];
 		
 		bool isTrigger = type == BiosemiEEG::triggerType;
-		float scaleFactor = isTrigger ? 256 : 256 * 0.03125; // scale to microvolts, in some boxes it may be div 4
-		
+		//float scaleFactor = isTrigger ? 256 : 256 * 0.03125; // scale to microvolts, in some boxes it may be div 4
+		float scaleFactor = isTrigger ? 256 : 256 * 32;
 		for (int j = 0; j < inSamples; j++) {
 			outChunk[j][i] = rawChunk[j][index] / scaleFactor;
 		}
