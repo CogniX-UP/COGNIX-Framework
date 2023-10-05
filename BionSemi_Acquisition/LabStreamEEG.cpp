@@ -169,13 +169,13 @@ void LabStreamEEG::Save(const std::string& location) {
 	}
 }
 
-void LabStreamEEG::SendData(BiosemiEEG::Chunk &rawChunk)
+void LabStreamEEG::SendData(BiosemiEEG::Chunk &rawChunk, BiosemiEEG::Chunk &outChunk)
 {
 	if (eeg.GetStatus() != BiosemiEEG::Acquiring)
 		return;
 
-	BiosemiEEG::Chunk sampleChunk;
-
+	rawChunk.clear();
+	outChunk.clear();
 	//Chunk from the device [#insamples x #channels] but lsls wants [#channels x #outsamples]
 	try {
 		eeg.GetChunk(rawChunk);
@@ -185,31 +185,32 @@ void LabStreamEEG::SendData(BiosemiEEG::Chunk &rawChunk)
 	}
 
 	int outChannels = activeChannels.size();
-	sampleChunk.resize(rawChunk.size());
-	
-
 	int inSamples = rawChunk.size();
-
 	if (inSamples <= 0)
 		return;
 
+	outChunk.resize(inSamples);
+
+	//Resize the internal channel vectors
+	for (int i = 0; i < inSamples; i++) {
+		outChunk[i].resize(outChannels);
+	}
+
+	//Apply the scaled data to the output
 	for (int i = 0; i < outChannels; i++) {
 		int index = activeChannelIndexes[i];
-		sampleChunk[i].resize(outChannels); 
-
 		auto& type = activeChannelTypes[index];
 		auto& label = activeChannels[index];
-
+		
 		bool isTrigger = type == BiosemiEEG::triggerType;
 		float scaleFactor = isTrigger ? 256 : 256 * 0.03125; // scale to microvolts, in some boxes it may be div 4
-
+		
 		for (int j = 0; j < inSamples; j++) {
-			sampleChunk[j][i] = rawChunk[j][index] / scaleFactor;
+			outChunk[j][i] = rawChunk[j][index] / scaleFactor;
 		}
 	}
 
-	//throw std::exception(std::to_string(outChannels).c_str());
 	//Do not resample before sending, may cause noise to alias in the lower frequencies!
-	//outlet->push_chunk(sampleChunk, lsl::local_clock() - streamSetting.compensatedLag);
+	outlet->push_chunk(outChunk, lsl::local_clock() - streamSetting.compensatedLag);
 }
 

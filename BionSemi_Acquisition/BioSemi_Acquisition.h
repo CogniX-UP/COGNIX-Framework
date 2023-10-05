@@ -6,6 +6,8 @@
 #include <memory>
 #include "LabStreamEEG.h"
 #include <vector>
+#include <QCloseEvent>
+
 class BioSemi_Acquisition : public QMainWindow
 {
     Q_OBJECT
@@ -31,5 +33,7 @@ private:
     void SaveFromUI();
 private slots:
     void onStreamStart();
+protected:
+    void closeEvent(QCloseEvent* event) override;
 
 };

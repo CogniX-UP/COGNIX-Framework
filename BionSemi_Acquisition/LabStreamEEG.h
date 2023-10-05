@@ -71,8 +71,11 @@ public:
 	/**
 	* Sends data that has been buffered through LSL.
 	*/
-	void SendData(BiosemiEEG::Chunk& chunk);
+	void SendData(BiosemiEEG::Chunk& rawChunk, BiosemiEEG::Chunk& outChunk);
 	
+	const std::vector<std::string>& ActiveChannels() { return activeChannels; }
+	const std::vector<std::string>& ActiveChannelTypes() { return activeChannelTypes; }
+	const std::vector<std::uint32_t>& ActiveChannelIndexes() { return activeChannelIndexes; }
 	//Synchronization meta-data
 	const float 
 		offsetMean = 0.00772,

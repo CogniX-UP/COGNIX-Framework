@@ -4,6 +4,7 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+
 BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -45,8 +46,15 @@ BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
 
 BioSemi_Acquisition::~BioSemi_Acquisition()
 {
-    if (dataThread)
-        dataThread->join();
+    KillDataThread(false);
+    labStream->StopStream();
+    labStream->DisconnectDevice();
+}
+void BioSemi_Acquisition::closeEvent(QCloseEvent* event)  {
+    
+    KillDataThread(false);
+    labStream->StopStream();
+    labStream->DisconnectDevice();
 }
 
 void BioSemi_Acquisition::onStreamStart() {
@@ -77,13 +85,13 @@ void BioSemi_Acquisition::onStreamStart() {
                 isStreaming = true;
                 auto& streamSetting = labStream->GetStreamSetting();
                 //Send the data here
+                BiosemiEEG::Chunk rawChunk, outChunk;
+
                 while (isStreaming) {
                     auto time = std::chrono::milliseconds(streamSetting.interval);
                     std::this_thread::sleep_for(time);
-                    BiosemiEEG::Chunk chunk;
-                    labStream->SendData(chunk);
+                    labStream->SendData(rawChunk, outChunk);
 
-                    LogText(std::to_string(chunk.size()).c_str(), false, true);
                 }
 
                 labStream->StopStream();
