@@ -1,3 +1,12 @@
+/**
+ * @file EEG/BiosemiEEG.h
+ * @author Georgios Papadoulis
+ *
+ * BioSemi acquisition. A modified version taken from an old LSL application for BioSemi.
+ * Remade to be programmer and extension friendly.
+ *
+ */
+
 #ifndef BIOSEMI_IO_H
 #define BIOSEMI_IO_H
 #include <vector>
@@ -11,10 +20,17 @@
 #define BIOSEMI_LINKAGE
 #endif
 
-//We assume that the order is synch -> triggers -> eeg -> exg -> aux -> analog for a regular set up
-//We won't be discussing daisy-channels for now, though code has been written for them 
+/**
+* The class BiosemiEEG for connecting with a BioSemi device and sending acquiring raw data.
+* It provides safety mechanisms as exceptions in case the acquisition doesn't work. The order
+* that the channels are read from is Synch -> Triggers -> EEG -> EXG (EXT) -> AUX -> Analog.
+* Though daisy-channels (multiple boxes) are supported, the LSL implementation hasn't taken them into account.
+*/
 class BiosemiEEG {
 public:
+	/**
+	* Keywords for the various types of channels.
+	*/
 	inline static const std::string
 		syncType = "Sync",
 		triggerType = "Trigger",
@@ -23,16 +39,6 @@ public:
 		auxType = "AUX",
 		aibType = "Analog";
 
-	inline static const std::string
-		ex1 = "EX1",
-		ex2 = "EX2",
-		ex3 = "EX3",
-		ex4 = "EX4",
-		ex5 = "EX5",
-		ex6 = "EX6",
-		ex7 = "EX7",
-		ex8 = "EX8";
-
 	enum Status {Idle, Initializing, Acquiring };
 	enum LogType {Normal, Error, Warning };
 	// raw sample from the BioSemi amp
@@ -40,44 +46,104 @@ public:
 	// chunk of raw samples
 	typedef std::vector<Sample_T> Chunk;
 
-	// initialize amplifier connection
 	BiosemiEEG();
-	// shut down amplifier connection
 	~BiosemiEEG();
 
+	/**
+	* Initializes a USB connection with the amplifier. If connected, data is continuously read to a buffer.
+	*/
 	void ConnectAmplifier();
+	/**
+	* Closes the USB connection to the amplifier.
+	*/
 	void DisconnectAmplifier();
-	// get a chunk of raw data
+	/**
+	* Fills an external chunk vector [num_samples x num_acquisitions] with the current buffer data, which is then reset.
+	* @param result The external chunk vector.
+	*/
 	void GetChunk(Chunk& result);
 
-	// get channel names
+	/**
+	* The channel labels as typically indicated by BioSemi [A1-H32] for EEG. A more complex set-up
+	* is given for multi-chained (daisy) boxes, but won't be discussed here.
+	* @return Channel Labels for BioSemi
+	*/
 	const std::vector<std::string>& ChannelLabels() const { return channelLabels; }
-	// get channel types (Sync, Trigger, EEG, EXG,
+
+	/**
+	* The channel types, such as Sync, Trigger, EEG etc.
+	* @return Channel Types for BioSemi
+	*/
 	const std::vector<std::string>& ChannelTypes() const { return channelTypes; }
 
-	// query amplifier parameters
+	/**
+	* Whether the box is MK1 or MK2.
+	* @return boolean indicating MK2 if true
+	*/
 	bool IsMk2() const { return is_mk2_; }
+	/**
+	* If the box has low battery.
+	* @return boolean indicating low battery status
+	*/
 	bool HasLowBattery() const { return battery_low_; }
+	/**
+	* The speed mode of the device. Typically the sampling rate, check the manual
+	* for further information.
+	* @return an integer in [1-8] range
+	*/
 	int SpeedMode() const { return speedMode; }
+	/**
+	* The sampling rate
+	* @return the sampling rate of the device
+	*/
 	int SampleRate() const { return sRate; }
+	/**
+	* @return the total channels of this device
+	*/
 	int AllChannelCount() const { return allChanCount; }
+	/**
+	* @return the number of sync channels (1 per box)
+	*/
 	int SyncChannelCount() const { return syncChanCount; }
+	/**
+	* @return the number of trigger channels (1 per box)
+	*/
 	int TriggerChannelCount() const { return trigChanCount; }
+	/**
+	* @return the number of EEG channels [1-256] per box
+	*/
 	int EegChannelCount() const { return eegChanCount; }
+	/**
+	* @return the number of external channels [1-8] per box
+	*/
 	int ExgChannelCount() const { return exgChanCount; }
+	/**
+	* @return the number of auxilary channels
+	*/
 	int AuxChannelCount() const { return auxChanCount; }
+	/**
+	* @return the number of analog channels
+	*/
 	int AibChannelCount() const { return aibChanCount; }
-	void SetLogCallback(std::function<void(const std::string&, LogType logType)>);
+	/**
+	* Sets a callback for singalling the various stages of the connection via string.
+	* @param fn the function to be called
+	* @param logType the log type [Normal, Error, Warning]
+	*/
+	void SetLogCallback(std::function<void(const std::string& fn, LogType logType)>);
+	
+	/**
+	* @return The status of the device [Idle, Initializing, Acquiring]
+	*/
 	Status GetStatus() { return status; }
 private:
-	// function handle types for the library IO
+	
 	typedef void* (BIOSEMI_LINKAGE* OPEN_DRIVER_ASYNC_t)(void);
 	typedef int (BIOSEMI_LINKAGE* USB_WRITE_t)(void*, const unsigned char*);
 	typedef int (BIOSEMI_LINKAGE* READ_MULTIPLE_SWEEPS_t)(void*, char*, int);
 	typedef int (BIOSEMI_LINKAGE* READ_POINTER_t)(void*, unsigned*);
 	typedef int (BIOSEMI_LINKAGE* CLOSE_DRIVER_ASYNC_t)(void*);
 
-	//log callback
 	std::function<void(std::string, LogType logType)> logCallback = nullptr;
 
 	Status status = Status::Idle;
