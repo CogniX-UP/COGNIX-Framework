@@ -1,4 +1,0 @@
-C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\CogniX_T2.vcxproj.CopyComplete
-C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\CogniX_T2.exe
-C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\lsl.dll
-C:\Users\salok\Documents\GitHub\COGNIX-Framework\CogniX_T2\x64\Release\pugixml.dll

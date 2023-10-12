@@ -1,4 +1,0 @@
-﻿  biosemi_io.cpp
-C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\TestConsoleApplication\biosemi_io.cpp(377,34): warning C4018: '>=': signed/unsigned mismatch
-C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\TestConsoleApplication\biosemi_io.cpp(380,34): warning C4018: '>=': signed/unsigned mismatch
-  TestConsoleApplication.vcxproj -> C:\Users\Giorgos\Desktop\COGNIX\Framework\TestConsoleApplication\x64\Debug\TestConsoleApplication.exe

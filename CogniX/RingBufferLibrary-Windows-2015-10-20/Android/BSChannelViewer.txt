@@ -1,7 +1,0 @@
-BSChannelViewer.apk is the App file created using Eclipse File->Export->Android/Export Android Application
-
-BSChannelViewer.zip is the source code created using the Eclipse File->Export->General/Archive File
-
-For a description of this App, see "../Doc/BSChannelViewer.html".
-
-For a description of client/server operation, see "../Doc/TryClientServer.html".
