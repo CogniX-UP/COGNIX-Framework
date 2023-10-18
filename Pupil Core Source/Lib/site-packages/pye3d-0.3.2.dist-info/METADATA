@@ -1,0 +1,89 @@
+Metadata-Version: 2.1
+Name: pye3d
+Version: 0.3.2
+Summary: 3D eye model
+Home-page: https://github.com/pupil-labs/pye3d-detector
+Author: Pupil Labs GmbH
+Author-email: info@pupil-labs.com
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: Other/Proprietary License
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.6
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: msgpack (>=1.0)
+Requires-Dist: numpy
+Requires-Dist: sortedcontainers
+Requires-Dist: importlib-metadata ; python_version < "3.8"
+Provides-Extra: docs
+Requires-Dist: furo ; extra == 'docs'
+Requires-Dist: jaraco.packaging (>=8.2) ; extra == 'docs'
+Requires-Dist: rst.linker (>=1.9) ; extra == 'docs'
+Requires-Dist: sphinx (<4.4) ; extra == 'docs'
+Provides-Extra: examples
+Requires-Dist: opencv-python ; extra == 'examples'
+Requires-Dist: pupil-detectors ; extra == 'examples'
+Provides-Extra: legacy_sklearn_models
+Requires-Dist: joblib ; extra == 'legacy_sklearn_models'
+Requires-Dist: scikit-learn ; extra == 'legacy_sklearn_models'
+Provides-Extra: testing
+Requires-Dist: matplotlib ; extra == 'testing'
+Requires-Dist: opencv-python-headless (==4.6.0.66) ; extra == 'testing'
+Requires-Dist: pandas ; extra == 'testing'
+Requires-Dist: pytest (>=6) ; extra == 'testing'
+Requires-Dist: pytest-checkdocs (>=2.4) ; extra == 'testing'
+Requires-Dist: pytest-cov ; extra == 'testing'
+Requires-Dist: pytest-enabler (>=1.0.1) ; extra == 'testing'
+Requires-Dist: scikit-image ; extra == 'testing'
+Provides-Extra: with_opencv
+Requires-Dist: opencv-python ; extra == 'with_opencv'
+
+.. image:: https://img.shields.io/pypi/v/pye3d.svg
+   :target: `PyPI link`_
+
+.. image:: https://img.shields.io/pypi/pyversions/pye3d.svg
+   :target: `PyPI link`_
+
+.. _PyPI link: https://pypi.org/project/pye3d
+
+.. image:: https://github.com/pupil-labs/pye3d-detector/actions/workflows/build-pye3d.yml/badge.svg
+   :target: https://github.com/pupil-labs/pye3d-detector/actions/workflows/build-pye3d.yml
+   :alt: Build pye3d
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+   :alt: Code style: Black
+
+.. image:: https://readthedocs.org/projects/pye3d-detector/badge/?version=latest
+   :target: https://pye3d-detector.readthedocs.io/en/latest/?badge=latest
+
+.. image:: https://img.shields.io/badge/skeleton-2021-informational
+   :target: https://blog.jaraco.com/skeleton
+
+
+pye3d Detector
+##############
+
+``pye3d`` implements a published mathematical 3D eye model capturing ocular kinematics
+and optics (see `Swirski and Dodgson, 2013`_, as well as `Dierkes, Kassner, and Bulling, 2019`_.
+
+.. _Swirski and Dodgson, 2013: https://www.researchgate.net/publication/264658852_A_fully-automatic_temporal_approach_to_single_camera_glint-free_3D_eye_model_fitting
+.. _Dierkes, Kassner, and Bulling, 2019: https://www.researchgate.net/publication/333490770_A_fast_approach_to_refraction-aware_eye-model_fitting_and_gaze_prediction
+
+Installation
+------------
+
+We recommend installing the pre-packaged binary wheels from PyPI:
+
+.. code-block:: console
+
+    pip install pye3d
+
+For more information see the `documentation <https://pye3d-detector.readthedocs.io>`_.
