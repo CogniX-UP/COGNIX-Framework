@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: ryven
+Version: 3.4.0
+Summary: Flow-based visual scripting for Python
+Home-page: https://github.com/leon-thomm/Ryven
+Author: Leon Thomm
+Author-email: l.thomm@mailbox.org
+Project-URL: Website, https://ryven.org
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: !=3.10,>=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: ryvencore-qt ==0.4.*
+Requires-Dist: ryvencore ==0.4.*
+Requires-Dist: Jinja2
+Requires-Dist: Pygments
+Requires-Dist: textdistance
+Requires-Dist: packaging
+
