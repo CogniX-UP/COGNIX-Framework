@@ -17,6 +17,9 @@ import lsl_capture.pylsl as lsl
 from lsl_capture.data import *
 from plugin import Plugin
 from pyglui import ui
+from abc import ABC
+
+from pupil.capture_settings.plugins.lsl_capture.data import Keywords
 
 VERSION = '2.1'
 
@@ -41,8 +44,12 @@ class Pupil_LSL_Relay(Plugin):
         logger.debug("Time after synchronization: {}".format(debug_ts_after))
         logger.debug("LabStreamingLayer time: {}".format(debug_ts_lsl))
 
-        self.outlet_uuid = outlet_uuid or str(uuid.uuid4())
-        self.outlet = self.construct_outlet()
+        w_s = Stream("pupil_capture_world")
+        self.world_stream = w_s
+        w_s.set_generic_gaze_extraction()
+        for i in range(2):
+            w_s._eye_channel_collection.norm_pos_channel(i).query = make_extract_normpos(i)
+        w_s.construct_stream(VERSION)        
 
     def recent_events(self, events):
         for gaze in events.get("gaze", ()):
@@ -60,7 +67,7 @@ class Pupil_LSL_Relay(Plugin):
         self.outlet.push_sample(sample, gaze["timestamp"])
 
     def extract_gaze_sample(self, gaze):
-        return [chan.query(gaze) for chan in self.channels]
+        return [chan.query(gaze) for chan in self.world_stream.q_channels]
 
     def init_ui(self):
         """Initializes sidebar menu"""
@@ -83,135 +90,72 @@ class Pupil_LSL_Relay(Plugin):
         """gets called when the plugin get terminated.
            This happens either voluntarily or forced.
         """
-        self.outlet = None
+        self.world_stream = None
 
-    def construct_outlet(self):
-        self.setup_channels()
-        stream_info = self.construct_streaminfo()
-        return lsl.StreamOutlet(stream_info)
 
-    def construct_streaminfo(self):
-        self.setup_channels()
-        stream_info = lsl.StreamInfo(
-            name="pupil_capture",
+ 
+#Stream Definitions and Data. This acts as a container mostly, with some helper methods.
+class Stream(ABC):
+    _eye_channel_collection:EyeChannelCollection
+    _stream_outlet:lsl.StreamOutlet
+    _stream_name:str
+    _stream_id:str
+    q_channels:list[Channel]
+    
+    def __init__(self, stream_name:str, stream_id:str = None, pos_coord_space:str = Keywords.worldCoord):
+        super().__init__()
+        self._eye_channel_collection = EyeChannelCollection(pos_coord_space = pos_coord_space)
+        self._stream_name = stream_name
+        self._stream_id = stream_id or str(uuid.uuid4())
+    
+    def __del__(self):
+        self._eye_channel_collection = None
+        self._stream_outlet = None
+        
+    @property
+    def eye_channels(self) -> EyeChannelCollection:
+        return self._eye_channel_collection
+    
+    #Sets queries based on gaze events. Ignores the normalized position, which should be set externally.
+    def set_generic_gaze_extraction(self):
+        eye_c = self._eye_channel_collection
+        eye_c.confidence_channel.query = extract_confidence
+        for i in range(3):
+            eye_c.gaze_point_3d_channel(i).query = make_extract_gaze_point_3d(i)
+        
+        for eye in range(2):
+            for i in range(3):
+                eye_c.eye_center_channel(eye, i).query = make_extract_eye_center_3d(eye, i)
+
+        for eye in range(2):
+            for i in range(3):
+                eye_c.gaze_normal_chanel(eye, i).query = make_extract_gaze_normal_3d(eye, i)
+        
+        for eye in range(2):
+            eye_c.diameter_2d_channel(i).query = make_extract_diameter_2d(i)
+                 
+        for eye in range(2):
+            eye_c.diameter_3d_channel(i).query = make_extract_diameter_3d(i)
+            
+        
+
+    #Constructs the stream. Should be called after every query we want has been initialized.
+    def construct_stream(self, plugin_version:str):
+        self.q_channels = self._eye_channel_collection.queriable_channels()
+        info = lsl.StreamInfo(
+            name= self._stream_name,
             type="Gaze",
-            channel_count=len(self.channels),
+            channel_count=len(self.q_channels),
             channel_format=lsl.cf_double64,
-            source_id=self.outlet_uuid,
+            source_id= self._stream_id,
         )
-        stream_info.desc().append_child_value("pupil_lsl_relay_version", VERSION)
-        xml_channels = stream_info.desc().append_child("channels")
-        for chan in self.channels:
+        
+        info.desc().append_child_value("pupil_lsl_relay_version", plugin_version)
+        xml_channels = info.desc().append_child("channels")
+        for chan in self.q_channels:
             chan.append_to(xml_channels)
-        return stream_info
-
-    def setup_channels(self):
-        self.channels = [confidence_channel(extract_confidence)]
         
-        self.channels.extend([norm_pos_channel(channel, make_extract_normpos(channel)) for channel in range(2)])
-        
-        self.channels.extend([gaze_point_3d_channel(channel, make_extract_gaze_point_3d(channel)) for channel in range(3)])
-        
-        self.channels.extend([eye_center_channel(eye, channel, make_extract_eye_center_3d(eye, channel)) 
-                            for eye in range(2)
-                            for channel in range(3)])
-        
-        self.channels.extend([gaze_normal_channel(eye, channel, make_extract_gaze_normal_3d(eye, channel))
-                            for eye in range(2)
-                            for channel in range(3)])
-        
-        self.channels.extend([diameter_2d_channel(eye, make_extract_diameter_2d(eye)) for eye in range(2)])
-        
-        self.channels.extend([diameter_3d_channel(eye, make_extract_diameter_3d(eye)) for eye in range(2)])
-
-    def confidence_channel(self):
-        return Channel(
-            query=extract_confidence,
-            label="confidence",
-            eye="both",
-            metatype="Confidence",
-            unit="normalized",
-        )
-
-    def norm_pos_channels(self):
-        return [
-            Channel(
-                query=make_extract_normpos(i),
-                label="norm_pos_" + "xy"[i],
-                eye="both",
-                metatype="Screen" + "XY"[i],
-                unit="normalized",
-                coordinate_system="world",
-            )
-            for i in range(2)
-        ]
-
-    def gaze_point_3d_channels(self):
-        return [
-            Channel(
-                query=make_extract_gaze_point_3d(i),
-                label="gaze_point_3d_" + "xyz"[i],
-                eye="both",
-                metatype="Direction" + "XYZ"[i],
-                unit="mm",
-                coordinate_system="world",
-            )
-            for i in range(3)
-        ]
-
-    def eye_center_channels(self):
-        return [
-            Channel(
-                query=make_extract_eye_center_3d(eye, i),
-                label="eye_center{}_3d_{}".format(eye, "xyz"[i]),
-                eye=("right", "left")[eye],
-                metatype="Position" + "XYZ"[i],
-                unit="mm",
-                coordinate_system="world",
-            )
-            for eye in range(2)
-            for i in range(3)
-        ]
-
-    def gaze_normal_channels(self):
-        return [
-            Channel(
-                query=make_extract_gaze_normal_3d(eye, i),
-                label="gaze_normal{}_{}".format(eye, "xyz"[i]),
-                eye=("right", "left")[eye],
-                metatype="Position" + "XYZ"[i],
-                unit="mm",
-                coordinate_system="world",
-            )
-            for eye in range(2)
-            for i in range(3)
-        ]
-
-    def diameter_2d_channels(self):
-        return [
-            Channel(
-                query=make_extract_diameter_2d(eye),
-                label="diameter{}_2d".format(eye),
-                eye=("right", "left")[eye],
-                metatype="Diameter",
-                unit="pixels",
-                coordinate_system="eye{}".format(eye),
-            )
-            for eye in range(2)
-        ]
-
-    def diameter_3d_channels(self):
-        return [
-            Channel(
-                query=make_extract_diameter_3d(eye),
-                label="diameter{}_3d".format(eye),
-                eye=("right", "left")[eye],
-                metatype="Diameter",
-                unit="mm",
-                coordinate_system="eye{}".format(eye),
-            )
-            for eye in range(2)
-        ]
+        self._stream_outlet = lsl.StreamOutlet(info)
 
 def extract_confidence(gaze):
     return gaze["confidence"]
@@ -237,7 +181,7 @@ def make_extract_eye_center_3d(eye, dim):
                 return gaze["eye_centers_3d"][str(eye)][dim]
             else:
                 raise KeyError(f"Expected field `{eye}` in {gaze['eye_centers_3d']}")
-        elif topic.endswith("3d.{}.".format(eye)):
+        elif topic.endswith(f"3d.{eye}."):
             return gaze["eye_center_3d"][dim]
         else:
             return np.nan
@@ -255,7 +199,7 @@ def make_extract_gaze_normal_3d(eye, dim):
                 return gaze["gaze_normals_3d"][str(eye)][dim]
             else:
                 raise KeyError(f"Expected field `{eye}` in {gaze['gaze_normals_3d']}")
-        elif topic.endswith("3d.{}.".format(eye)):
+        elif topic.endswith(f"3d.{eye}."):
             return gaze["gaze_normal_3d"][dim]
         else:
             return np.nan
