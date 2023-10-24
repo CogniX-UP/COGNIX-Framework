@@ -9,7 +9,13 @@ class Keywords:
     mmUnit = "mm"
     
 class Channel:
-    def __init__(self, label, eye, metatype, unit, coordinate_system = None, query = None):
+    label:str
+    eye:str
+    metatype:str
+    unit:str
+    coordinate_system:str
+    
+    def __init__(self, label:str, eye:str, metatype:str, unit:str, coordinate_system:str = None, query = None):
         self.label = label
         self.eye = eye
         self.metatype = metatype
@@ -86,7 +92,7 @@ class EyeChannelCollection:
         for eye in self.eye_center_channels:
             for c in eye:
                 buffer.append(c)
-        for eye in self.eye_center_channels:
+        for eye in self.gaze_normal_channels:
             for c in eye:
                 buffer.append(c)
         for c in self.diameter_2d_channels:
@@ -102,7 +108,7 @@ def norm_pos_channel(i:int, query = None, pos_coord_system:str = Keywords.worldC
     return Channel("norm_pos_" + "xy"[i], Keywords.bothEyes, get_screen_meta(i), Keywords.normUnit, pos_coord_system, query)
 
 def gaze_point_3d_channel(channel:int, query = None) -> Channel:
-    return Channel("gaze_point_3d_" + "xyz"[channel], 
+    return Channel(f"gaze_point_3d_{'xyz'[channel]}", 
                    Keywords.bothEyes, get_dir_meta(channel), Keywords.mmUnit, Keywords.worldCoord, query)
     
 def eye_center_channel(eye:int, channel:int, query = None) -> Channel:
@@ -118,7 +124,7 @@ def diameter_3d_channel(eye:int, query = None) -> Channel:
     return Channel(f"diameter{eye}_3d", get_eye_type(eye), "Diameter", Keywords.mmUnit, f"eye{eye}", query)
 
 def get_eye_type(eye: int) -> str:
-    (Keywords.rightEye, Keywords.leftEye)[eye]
+    return (Keywords.rightEye, Keywords.leftEye)[eye]
 def get_position_meta(channel: int) -> str:
     return f"Position{'XYZ'[channel]}"
 def get_screen_meta(channel: int) ->str:

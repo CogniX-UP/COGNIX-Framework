@@ -1,0 +1,2 @@
+//Activate environment through Scripts/activate
+//run with python through python main.py capture #or player/service

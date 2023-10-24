@@ -52,22 +52,22 @@ class Pupil_LSL_Relay(Plugin):
         w_s.construct_stream(VERSION)        
 
     def recent_events(self, events):
-        for gaze in events.get("gaze", ()):
-            self.push_gaze_sample(gaze)
+        #for world gaze
+        gaze_events = events.get("gaze", [])
+        for gaze_event in gaze_events:
+            self.push_world_gaze_sample(gaze_event)
+        #for surfaces
 
-    def push_gaze_sample(self, gaze):
+    def push_world_gaze_sample(self, gaze):
         try:
-            sample = self.extract_gaze_sample(gaze)
+            sample = [chan.query(gaze) for chan in self.world_stream.q_channels]
         except Exception as exc:
-            logger.error("Error extracting gaze sample: {}".format(exc))
+            logger.error(f"Error extracting gaze sample: {exc}")
             logger.debug(str(gaze))
             return
         # push_chunk might be more efficient but does not
         # allow to set explicit timstamps for all samples
-        self.outlet.push_sample(sample, gaze["timestamp"])
-
-    def extract_gaze_sample(self, gaze):
-        return [chan.query(gaze) for chan in self.world_stream.q_channels]
+        self.world_stream.outlet.push_sample(sample, gaze["timestamp"])
 
     def init_ui(self):
         """Initializes sidebar menu"""
@@ -84,7 +84,7 @@ class Pupil_LSL_Relay(Plugin):
         self.remove_menu()
 
     def get_init_dict(self):
-        return {"outlet_uuid": self.outlet_uuid}
+        return {"outlet_uuid": self.world_stream._stream_id}
 
     def cleanup(self):
         """gets called when the plugin get terminated.
@@ -115,6 +115,9 @@ class Stream(ABC):
     @property
     def eye_channels(self) -> EyeChannelCollection:
         return self._eye_channel_collection
+    @property
+    def outlet(self) -> lsl.StreamOutlet:
+        return self._stream_outlet
     
     #Sets queries based on gaze events. Ignores the normalized position, which should be set externally.
     def set_generic_gaze_extraction(self):
@@ -132,10 +135,10 @@ class Stream(ABC):
                 eye_c.gaze_normal_chanel(eye, i).query = make_extract_gaze_normal_3d(eye, i)
         
         for eye in range(2):
-            eye_c.diameter_2d_channel(i).query = make_extract_diameter_2d(i)
+            eye_c.diameter_2d_channel(eye).query = make_extract_diameter_2d(eye)
                  
         for eye in range(2):
-            eye_c.diameter_3d_channel(i).query = make_extract_diameter_3d(i)
+            eye_c.diameter_3d_channel(eye).query = make_extract_diameter_3d(eye)
             
         
 
