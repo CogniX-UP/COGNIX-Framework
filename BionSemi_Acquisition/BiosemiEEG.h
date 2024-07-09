@@ -1,7 +1,9 @@
 /**
  * @file EEG/BiosemiEEG.h
- * @author Georgios Papadoulis
+ * @author Georgios Papadoulis 
  *
+ * 2024
+ * 
  * BioSemi acquisition. A modified version taken from an old LSL application for BioSemi.
  * Remade to be programmer and extension friendly.
  *
@@ -21,10 +23,10 @@
 #endif
 
 /**
-* The class BiosemiEEG for connecting with a BioSemi device and sending acquiring raw data.
+* The class BiosemiEEG for connecting with a BioSemi device and sending acquired raw data.
 * It provides safety mechanisms as exceptions in case the acquisition doesn't work. The order
 * that the channels are read from is Synch -> Triggers -> EEG -> EXG (EXT) -> AUX -> Analog.
-* Though daisy-channels (multiple boxes) are supported, the LSL implementation hasn't taken them into account.
+* Though daisy-channels (multiple boxes) are supported, this LSL implementation hasn't taken them into account.
 */
 class BiosemiEEG {
 public:
@@ -58,7 +60,7 @@ public:
 	*/
 	void DisconnectAmplifier();
 	/**
-	* Fills an external chunk vector [num_samples x num_acquisitions] with the current buffer data, which is then reset.
+	* Fills an external chunk vector [samples x channels] with the current buffer data, which is then reset.
 	* @param result The external chunk vector.
 	*/
 	void GetChunk(Chunk& result);

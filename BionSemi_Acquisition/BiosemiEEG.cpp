@@ -225,10 +225,10 @@ void BiosemiEEG::ConnectAmplifier() {
 
 	// determine sampling rate (http://www.biosemi.com/faq/adjust_samplerate.htm)
 	switch (speedMode & 3) {
-	case 0: sRate = 2048; break;
-	case 1: sRate = 4096; break;
-	case 2: sRate = 8192; break;
-	case 3: sRate = 16384; break;
+		case 0: sRate = 2048; break;
+		case 1: sRate = 4096; break;
+		case 2: sRate = 8192; break;
+		case 3: sRate = 16384; break;
 	}
 	// speed modes lower than 3 are special on Mk2 and are for daisy-chained setups (@2KHz)
 	bool multibox = false;
@@ -246,35 +246,35 @@ void BiosemiEEG::ConnectAmplifier() {
 		// in an Mk2 the speed modes 0-3 are for up to 4 daisy-chained boxes; these are 
 		// multiplexed, have 128ch EEG each and 8ch EXG each, plus 16 extra channels each (howdy!)
 		switch (speedMode) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			eegChanCount = 4 * 128; exgChanCount = 4 * 8; auxChanCount = 4 * 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 610; break;
-			// spd modes 4-7 are the regular ones and have 8 EXG's added in
-		case 4: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 282; break;
-		case 5: eegChanCount = 128; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 154; break;
-		case 6: eegChanCount = 64; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 90; break;
-		case 7: eegChanCount = 32; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 58; break;
-			// spd mode 8 adds
-		case 8: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 314; break;
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				eegChanCount = 4 * 128; exgChanCount = 4 * 8; auxChanCount = 4 * 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 610; break;
+				// spd modes 4-7 are the regular ones and have 8 EXG's added in
+			case 4: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 282; break;
+			case 5: eegChanCount = 128; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 154; break;
+			case 6: eegChanCount = 64; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 90; break;
+			case 7: eegChanCount = 32; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 58; break;
+				// spd mode 8 adds
+			case 8: eegChanCount = 256; exgChanCount = 8; auxChanCount = 16; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 314; break;
 		}
 	}
 	else {
 		// in a Mk1 the EXG's are off in spd mode 0-3 and on in spd mode 4-7 (but subtracted from the EEG channels)
 		switch (speedMode) {
 			// these are all-EEG modes
-		case 0: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
-		case 1: eegChanCount = 128; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
-		case 2: eegChanCount = 64; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
-		case 3: eegChanCount = 32; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
-			// in these modes there are are 8 EXGs and 16 aux channels
-		case 4: eegChanCount = 232; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
-		case 5: eegChanCount = 104; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
-		case 6: eegChanCount = 40; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
-		case 7: eegChanCount = 8; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
-			// in spd mode 8 there are 32 AIB channels from an Analog Input Box (AIB) multiplexed in (EXGs are off)
-		case 8: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 290; break;
+			case 0: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
+			case 1: eegChanCount = 128; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
+			case 2: eegChanCount = 64; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
+			case 3: eegChanCount = 32; exgChanCount = 0; auxChanCount = 0; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
+				// in these modes there are are 8 EXGs and 16 aux channels
+			case 4: eegChanCount = 232; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 258; break;
+			case 5: eegChanCount = 104; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 130; break;
+			case 6: eegChanCount = 40; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 66; break;
+			case 7: eegChanCount = 8; exgChanCount = 8; auxChanCount = 16; aibChanCount = 0; trigChanCount = 1; syncChanCount = 1; allChanCount = 34; break;
+				// in spd mode 8 there are 32 AIB channels from an Analog Input Box (AIB) multiplexed in (EXGs are off)
+			case 8: eegChanCount = 256; exgChanCount = 0; auxChanCount = 0; aibChanCount = 32; trigChanCount = 1; syncChanCount = 1; allChanCount = 290; break;
 		}
 	}
 

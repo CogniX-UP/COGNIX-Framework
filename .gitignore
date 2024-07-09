@@ -479,9 +479,9 @@ CMakeLists.txt.user*
 *.idb
 *.ilk
 *.pdb
-*.sln
+# *.sln
 *.suo
-*.vcproj
+# *.vcproj
 *vcproj.*.*.user
 *.ncb
 *.sdf
