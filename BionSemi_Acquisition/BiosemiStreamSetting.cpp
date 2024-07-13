@@ -18,8 +18,38 @@ const char* fwMode = "w";
 #endif
 
 #define key(x)  rapidjson::GenericStringRef(x.c_str())
-/*
-*/
+
+
+std::vector<bool> BiosemiStreamSetting::ChannelMask(BiosemiEEG &eeg) {
+	auto res = std::vector<bool>(eeg.AllChannelCount());
+	// TODO (DONT) Ignore the trigger and sync for now
+	int c = 0;
+	for (int i = c; i < eeg.SyncChannelCount(); i++)
+		res[i] = false;
+	c += eeg.SyncChannelCount();
+	for (int i = c; i < eeg.TriggerChannelCount() + c; i++)
+		res[i] = false;
+	c += eeg.TriggerChannelCount();
+	// We'll also ignore multi box for now
+	//Channels
+	int eegCount = 0;
+	for (int i = c; i < eeg.EegChannelCount() + c; i++) {
+		if (eegCount >= eegChannelCount)
+			break;
+		eegCount++;
+		res[i] = true;
+	}
+	c += eeg.EegChannelCount();
+	//EXG
+	auto &exgs = GetExgs();
+	for (int i = c; i < eeg.ExgChannelCount() + c; i++) {
+		res[i] = exgs[i - c];
+	}
+	c += eeg.ExgChannelCount();
+	// TODO (DONT) Ignore the rest
+	return res;
+}
+
 void BiosemiStreamSetting::Load(const std::string &config, bool isFile)
 {
 	//Parse the doc
@@ -79,7 +109,7 @@ void BiosemiStreamSetting::Load(const std::string &config, bool isFile)
 
 		auto& channelSetting = eegSetting[chanKey.c_str()];
 		if (!channelSetting.IsNull()) {
-			channelCount = channelSetting[chanCountKey.c_str()].GetInt();
+			eegChannelCount = channelSetting[chanCountKey.c_str()].GetInt();
 			//EEG labels for non-daisy chained boxes
 			auto& biosemiLabels = GetBiosemiLabels();
 			biosemiToStream.clear();
@@ -132,7 +162,7 @@ void BiosemiStreamSetting::Save(const std::string& filePath)
 	}
 
 	rapidjson::Value chanValue(rapidjson::kObjectType);
-	chanValue.AddMember(key(chanCountKey), channelCount, alloc);
+	chanValue.AddMember(key(chanCountKey), eegChannelCount, alloc);
 	for (auto& pair : biosemiToStream) {
 		chanValue.AddMember(key(pair.first), key(pair.second), alloc);
 	}

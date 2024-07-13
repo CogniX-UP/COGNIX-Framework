@@ -7,8 +7,8 @@
     },
     "eeg": {
         "exg": {
-            "EX1": false,
-            "EX2": false,
+            "EX1": true,
+            "EX2": true,
             "EX3": false,
             "EX4": false,
             "EX5": false,

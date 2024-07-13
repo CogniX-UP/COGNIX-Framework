@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "BiosemiEEG.h"
 
  /**
  * The class BiosemiStreamSetting for acquiring raw data from the BioSemi ActiveTwo,
@@ -44,7 +45,6 @@ public:
 	*/
 	inline static const std::string
 		eegKey = "eeg",
-		eegChannelCount = "count",
 		exgKey = "exg",
 		gKey = "general",
 		compLagKey = "compensated_lag",
@@ -84,12 +84,17 @@ public:
 	/**
 	* BioSemi has a 256 available channels, typically named A1-H32. This returns a mapping of
 	* (A1-H32) -> (other_names), since typically we will have 32 channels and we want them named
-	* per the 10-20 system.
+	* per the 10-20 system. (281 channels with the peripherals available)
 	* 
 	* @return A mapping of the local channel names to custom names set by the user.
 	*/
 	std::map<std::string, std::string> &GetBiosemiToStream() { return biosemiToStream; }
-	
+
+	/*
+	* Creates a mask of which channels to send to the eeg, ordered as originally received
+	* through their USB interface.
+	*/
+	std::vector<bool> ChannelMask(BiosemiEEG &eeg);
 	/**
 	* The time waited for the next chunk to be sent.
 	*/
@@ -103,10 +108,10 @@ public:
 	*/
 	int causalCorrection = 0;
 	/**
-	* The channels number of channels to be sent (A1-H32), each label having 32 channels.
+	* The channels count of EEG channels to be sent (A1-H32), each label having 32 channels.
 	* The values it can take is 32, 64, 128, 256
 	*/
-	int channelCount = 32;
+	int eegChannelCount = 32;
 private:
 	std::string streamName = "biosemi";
 	std::vector<bool> exgs { false, false, false, false, false, false, false, false };

@@ -425,7 +425,7 @@ void BiosemiEEG::ConnectAmplifier() {
 		channelTypes.push_back(triggerType);
 	}
 
-	//Won't look at this for now - it's for speed less than 4
+	//Won't look at this for now - it's for speed less than 4 and is not supported
 	if (multibox) {
 		// multi-box setup
 		for (int b = 0; b <= 3; b++) {

@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <qtextcursor.h>
+
 BioSemi_Acquisition::BioSemi_Acquisition(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -94,6 +95,14 @@ void BioSemi_Acquisition::onStreamStart() {
 
                 LogText(separator, false, true);
 
+                std::stringstream channelStr;
+
+                for (auto &chann: labStream->ActiveChannels()) {
+                    channelStr << chann << " ";
+                }
+
+                LogText(channelStr.str().c_str(), false, true)
+
 ;               while (isStreaming) {
                     auto interval = std::chrono::milliseconds(streamSetting.interval);
                     std::this_thread::sleep_for(interval);
@@ -104,13 +113,18 @@ void BioSemi_Acquisition::onStreamStart() {
                     auto time = std::ctime(&timeT);
                     std::string sTime(time);
                     sTime.erase(sTime.length() - 1);
-                    s <<"[" << sTime << "]" << " Send " << rawChunk.size() << " samples";
-                    
-                    QString result(s.str().c_str());
-                    QMetaObject::invokeMethod(this, [this, result] {
-                        auto txtArea = ui.dataText;
-                        txtArea->setText(result);
-                    }, Qt::QueuedConnection);
+
+                    auto samples = rawChunk.size();
+
+                    if (samples > 0) {
+                        s << "[" << sTime << "]" << " Send " << rawChunk.size() << " samples";
+
+                        QString result(s.str().c_str());
+                        QMetaObject::invokeMethod(this, [this, result] {
+                            auto txtArea = ui.dataText;
+                            txtArea->setText(result);
+                            }, Qt::QueuedConnection);
+                    }
                 }
 
                 labStream->StopStream();
@@ -206,7 +220,7 @@ void BioSemi_Acquisition::LoadToUI() {
     ui.streamNameEdit->setText(streamSetting.StreamName().c_str());
     ui.sendIntervalEdit->setText(std::to_string(streamSetting.interval).c_str());
 
-    switch (streamSetting.channelCount) {
+    switch (streamSetting.eegChannelCount) {
     case 32:
         ui.subsetChoice->setCurrentIndex(1);
         break;
@@ -236,19 +250,19 @@ void BioSemi_Acquisition::SaveFromUI() {
 
     switch (ui.subsetChoice->currentIndex()) {
     case 0:
-        streamSetting.channelCount = 0;
+        streamSetting.eegChannelCount = 256;
         break;
     case 1:
-        streamSetting.channelCount = 32;
+        streamSetting.eegChannelCount = 32;
         break;
     case 2:
-        streamSetting.channelCount = 64;
+        streamSetting.eegChannelCount = 64;
         break;
     case 3:
-        streamSetting.channelCount = 128;
+        streamSetting.eegChannelCount = 128;
         break;
     case 4:
-        streamSetting.channelCount = 256;
+        streamSetting.eegChannelCount = 256;
         break;
     }
 
