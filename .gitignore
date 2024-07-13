@@ -500,3 +500,4 @@ CMakeLists.txt.user*
 # --------
 *.dll
 *.exe
+BionSemi_Acquisition/settings.json
