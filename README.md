@@ -1,14 +1,5 @@
-# COGNIX-Framework
-EEG-Eye Gaze Real-Time Processing Framework
+# CogniX BioSemi-LSL Streamer
 
-This is the repository for the CogniX project currently developed at the ECE department of the University of Patras. Its aim is to make EEG and Eye-Gaze Processing
-and inferencing easier and more accessible to the developer, while also providing tools to make cognition aware interfaces.
+This repository contains a customized implementation of an LSL (Lab Streaming Layer) streamer for the BioSemi Active Two Mk2 system. This implementation is based on the original application developed by the Lab Streaming Layer community: [App-BioSemi](https://github.com/labstreaminglayer/App-BioSemi).
 
-The project currently is at an early development stage.
-
-UPDATE 4/2/2024: The project is currently under restructure into sub-modules. Updates will be up during April 2024.
-
-The current project is located in two forks:
-
-https://github.com/HeftyCoder/ryvencore/
-https://github.com/HeftyCoder/Ryven
+![Screenshot 2024-07-18 121531](https://github.com/user-attachments/assets/fb986205-724c-47e9-8518-472ca990d419)
